@@ -1,0 +1,20 @@
+{
+  "name": "tileserver",
+  "version": "1.0.0",
+  "description": "first version of FirstLife tile server",
+  "main": "index.js",
+  "scripts": {
+    "test": "test.js"
+  },
+  "keywords": [
+    "geojson",
+    "tileserver",
+    "vectortile"
+  ],
+  "author": "Stefania Buccoliero, Alessio Antonini",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@mapbox/tilelive": "^5.12.3",
+    "@mapbox/tilelive-omnivore": "^3.1.2"
+  }
+}
