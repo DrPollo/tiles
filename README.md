@@ -16,3 +16,5 @@ To test tileserver run:
 node test.js
 ```
 
+to test
+http://localhost:3095/tile/z/13/x/4268/y/2944
