@@ -1,0 +1,65 @@
+[{
+  "name": "Geography Class",
+  "scheme": "geojson",
+  "tiles": [
+    "level_4.geojson"
+  ],
+  "minzoom": 3,
+  "maxzoom": 5
+}, {
+  "name": "Geography Class",
+  "scheme": "geojson",
+  "tiles": [
+    "level_6.geojson"
+  ],
+  "minzoom": 6,
+  "maxzoom": 7
+}, {
+  "name": "Geography Class",
+  "scheme": "geojson",
+  "tiles": [
+    "level_8.geojson"
+  ],
+  "minzoom": 8,
+  "maxzoom": 10
+}, {
+  "name": "Geography Class",
+  "scheme": "geojson",
+  "tiles": [
+    "level_10.geojson"
+  ],
+  "minzoom": 11,
+  "maxzoom": 12
+}, {
+  "name": "Geography Class",
+  "scheme": "geojson",
+  "tiles": [
+    "level_13.geojson"
+  ],
+  "minzoom": 13,
+  "maxzoom": 14
+}, {
+  "name": "Geography Class",
+  "scheme": "geojson",
+  "tiles": [
+    "level_14.geojson"
+  ],
+  "minzoom": 15,
+  "maxzoom": 17
+}, {
+  "name": "Geography Class",
+  "scheme": "geojson",
+  "tiles": [
+    "level_16.geojson"
+  ],
+  "minzoom": 18,
+  "maxzoom": 20
+}, {
+  "name": "Geography Class",
+  "scheme": "geojson",
+  "tiles": [
+    "level_18.geojson"
+  ],
+  "minzoom": 21,
+  "maxzoom": 22
+}]
