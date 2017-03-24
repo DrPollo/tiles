@@ -107,38 +107,6 @@ app.get('/tile/:z/:x/:y', function(req, res) {
 });
 
 
-
-function getZoomFile(zFile) {
-    var zoom_map = filepath;
-    var z =  req.params.z;
-    var obj;
-    fs.readFile(zoom_map, 'utf8', function (err, data) {
-        if (err) throw err;
-        var obj = JSON.parse(data);
-        for (var prop in obj) {
-            var min = obj[prop].minzoom;
-            var max = obj[prop].maxzoom;
-            if(z >= min && z <= max) {
-                console.log(obj[prop].tiles);
-                return zFile( obj[prop].tiles );
-            }else{
-                return zFile( 'file not found' );
-            }
-        }
-
-    });
-}
-
-function zFile(z){
-    return z;
-}
-
-
-
-
-
-
-
 /* ----------------------------------------------------------------------
  /	description
  /	@params
