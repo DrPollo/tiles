@@ -65,7 +65,6 @@ app.get('/tile/:z/:x/:y', function(req, res) {
                 var min = obj[prop].minzoom;
                 var max = obj[prop].maxzoom;
                 if(z >= min && z <= max) {
-                    console.log('yes', obj[prop].tiles);
                     result = obj[prop].tiles;
                 }
             }
@@ -73,7 +72,6 @@ app.get('/tile/:z/:x/:y', function(req, res) {
         });
 
     }).then(function(file){
-        console.log('here', file);
 
         var uri = omniUri.concat(__dirname, '/geojson/',file);
         console.log(uri);
@@ -89,7 +87,7 @@ app.get('/tile/:z/:x/:y', function(req, res) {
                         //console.log('unzipped',unzipped);
                         if (err) return res.send('no tile');
                         var tile = new VectorTile(new Protobuf(unzipped));
-                        return res.send(tile.layers);
+                        return res.status(200).send(tile.layers);
 
                         // src.close(function(err){
                         //     console.log(err);
@@ -98,7 +96,7 @@ app.get('/tile/:z/:x/:y', function(req, res) {
                 });
             }
             catch(err){
-                console.log('error');
+                res.status(500).send('error');
             }
         });
 
@@ -115,20 +113,14 @@ app.get('/tile/:z/:x/:y', function(req, res) {
 
 // respond with "hello world" when a GET request is made to the homepage
 app.get('/', function(req, res) {
-    res.send('hello world');
-});
-
-app.get('/zoom/:z', function(req, res) {
-
-
-
+    res.send('Tile server is running');
 });
 
 
 
 
 app.listen(3095, function () {
-    console.log('Example app listening on port 3095!');
+    console.log('Tile server is running on port: 3095');
 });
 
 
