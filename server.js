@@ -21,7 +21,6 @@ var Protobuf  = require('pbf');
 var zlib = require('zlib');
 
 
-
 // new Omnivore(uri, function(err, source) {
 //   var readable = tilelive.createReadStream(source,{type:'pyramid',job:{total:4,num:1}, maxzoom:8, minzoom:8});
 //   var tile = new VerctorTile(new Protobuf(data) )
@@ -29,12 +28,11 @@ var zlib = require('zlib');
 //     var writable = tilelive.createWriteStream(sink);
 //     readable.pipe(writable);
 //   })
-//   source.getInfo(function(err, info) {
+//   source.getInfo(function(err, infgit o) {
 //     console.log(info);
 //   });
-
-
 // });
+
 
 /* ----------------------------------------------------------------------
  /	read and return a tile in pbf format
@@ -83,17 +81,22 @@ app.get('/tile/:z/:x/:y', function(req, res) {
                     var pbf = new Protobuf(data);
                     console.log('pbf' , pbf);
 
-                    zlib.gunzip(data, function(err, unzipped) {
-                        //console.log('unzipped',unzipped);
-                        if (err) return res.send('no tile');
-                        var tile = new VectorTile(new Protobuf(unzipped));
-                        return res.status(200).send(tile.layers);
+                    // zlib.gunzip(data, function(err, unzipped) {
+                    //     //console.log('unzipped',unzipped);
+                    //     if (err) return res.send('no tile');
+                    //     var tile = new VectorTile(new Protobuf(unzipped));
+                    //     return res.status(200).send(tile.layers);
 
-                        // src.close(function(err){
-                        //     console.log(err);
-                        // });
-                    });
+                    //     // src.close(function(err){
+                    //     //     console.log(err);
+                    //     // });
+                    // });
+
                 });
+                res.setHeader('Content-Encoding', 'gzip');
+                res.setHeader('Access-Control-Allow-Origin:':'*');
+                res.setHeader('Content-Type':'application/x-protobuf');
+                return res.status(200).send(pbf.buf);
             }
             catch(err){
                 res.status(500).send('error');
