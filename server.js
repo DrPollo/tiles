@@ -6,14 +6,17 @@ var router = express.Router();
 var app = express();
 var fs = require('fs');
 var Promise = require('promise');
-/* ----------------------------------------------------------------------
- /	omnivore
- / ---------------------------------------------------------------------- */
 
 var tilelive = require('@mapbox/tilelive');
 var Omnivore = require('@mapbox/tilelive-omnivore');
 var mbtile = require('mbtiles');
-var filepath = __dirname+'/geojson/tilemap.json';
+var path = require('path');
+var geojsonExtent = require('geojson-extent');
+
+
+var fd =  __dirname + '/geojson/level_13.geojson';
+var filepath = __dirname +'/geojson/tilemap.json';
+
 var omniUri = 'omnivore://';
 var uriMB = __dirname+'/output.mbtiles';
 var VectorTile = require('vector-tile').VectorTile;
@@ -32,6 +35,37 @@ var zlib = require('zlib');
 //     console.log(info);
 //   });
 // });
+
+/*----------------------------------------*/
+
+app.get('/render', function(req, res) {
+
+
+    var folder = fd;
+    fs.readFile(folder, 'utf8', function (err, data) {
+        if (err) throw err;
+        obj = JSON.parse(data);
+        console.log(geojsonExtent(obj));
+    });
+
+
+    // fs.readdir(folder, function(err, files){
+    //     if (err) {
+    //         throw err;
+    //     }
+    //     files.map(function (file) {
+    //         return path.join(folder, file);
+    //     }).filter(function (file) {
+    //         return fs.statSync(file).isFile();
+    //     }).forEach(function (file) {
+    //         console.log("%s (%s)", file, path.extname(file));
+    //         console.log(geojsonExtent(file));
+    //     });
+    //
+    //
+    // })
+
+});
 
 
 /* ----------------------------------------------------------------------
@@ -94,8 +128,8 @@ app.get('/tile/:z/:x/:y', function(req, res) {
 
                 });
                 res.setHeader('Content-Encoding', 'gzip');
-                res.setHeader('Access-Control-Allow-Origin:':'*');
-                res.setHeader('Content-Type':'application/x-protobuf');
+                res.setHeader('Access-Control-Allow-Origin:','*');
+                res.setHeader('Content-Type','application/x-protobuf');
                 return res.status(200).send(pbf.buf);
             }
             catch(err){
