@@ -1,0 +1,42 @@
+{
+  "level_4.geojson": {
+    "minzoom": 3,
+    "maxzoom": 5,
+    "layer":"interactive"
+  },
+  "level_6.geojson": {
+    "minzoom": 6,
+    "maxzoom": 7,
+    "layer":"interactive"
+  },
+  "level_8.geojson": {
+    "minzoom": 8,
+    "maxzoom": 10,
+    "layer":"interactive"
+  },
+  "level_10.geojson": {
+    "minzoom": 11,
+    "maxzoom": 12,
+    "layer":"interactive"
+  },
+  "level_13.geojson": {
+    "minzoom": 13,
+    "maxzoom": 14,
+    "layer":"interactive"
+  },
+  "level_14.geojson": {
+    "minzoom": 15,
+    "maxzoom": 16,
+    "layer":"interactive"
+  },
+  "level_16.geojson": {
+    "minzoom": 17,
+    "maxzoom": 18,
+    "layer":"interactive"
+  },
+  "level_18.geojson": {
+    "minzoom": 19,
+    "maxzoom": 20,
+    "layer":"interactive"
+  }
+}
