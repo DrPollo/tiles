@@ -1,6 +1,7 @@
 node_modules
 output.mbtiles
 .idea
- mbtiles/**/*
+ mbtiles/*
  geojson/**/*.geojson
- /**/.DS_Store
+ geojson/tippecanoe
+ .DS_Store
