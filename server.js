@@ -43,7 +43,7 @@ app.get('/tile/:z/:x/:y', function(req, res) {
 
     if(!obj){
         console.error('cannot load source mapping')
-        return
+        return res.status(404).send('nothing to load');
     }
 
 
@@ -71,7 +71,7 @@ app.get('/tile/:z/:x/:y', function(req, res) {
 
         }
         catch(err){
-            res.status(500).send('error');
+            res.status(500).send('db connection error');
         }
     });
 
