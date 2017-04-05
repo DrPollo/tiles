@@ -75,9 +75,13 @@ gulp.task('loadgeojson',function () {
                     }
                     return feature;
                 });
-                try{
+                try {
                     // cancello il file
                     fs.unlinkSync(geojsonpath+tippecanoepath+file);
+                }catch (err){
+                    console.log('nothing to delete');
+                }
+                try{
                     // scrivo il file
                     fse.writeJsonSync(geojsonpath+tippecanoepath+file,newFeatures);
                 }catch (err){
@@ -135,8 +139,12 @@ gulp.task('generatembtile',function() {
             console.log('generating mbtiles from ',file,' with result: ', (code ===0) ?'ok': 'error code'+code);
         }
     }
+    try {
+        fs.unlinkSync(mbtilespath + sourcemap);
+    }catch (err){
+        console.log('nothing to delete');
+    }
     try{
-        fs.unlinkSync(mbtilespath+sourcemap);
         fse.writeJsonSync(mbtilespath+sourcemap,mbtiles);
     }catch (err){
         console.error('write file error ', err);
