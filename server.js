@@ -10,8 +10,8 @@ var Promise = require('promise');
 var tilelive = require('@mapbox/tilelive');
 var MBTiles = require('mbtiles');
 var path = require('path');
-
-var filepath = __dirname +'/mbTiles/mbTilesMap.json';
+var mbtilespath = '/mbtiles/';
+var filepath = __dirname +mbtilespath+'sourcemap.json';
 
 var MBtileUri = 'mbtiles://';
 var VectorTile = require('vector-tile').VectorTile;
@@ -42,22 +42,22 @@ app.get('/tile/:z/:x/:y', function(req, res) {
        fs.readFile(zoom_map, 'utf8', function (err, data) {
             if (err) throw err;
             var obj = JSON.parse(data);
-            var result ;
-            for (var prop in obj) {
-                var min = obj[prop].minzoom;
-                var max = obj[prop].maxzoom;
-                if(z >= min && z <= max) {
-                    result = obj[prop].tiles;
-
-                }
-            }
-            resolve(result);
+            // var result ;
+            // for (var prop in obj) {
+            //     var min = obj[prop].minzoom;
+            //     var max = obj[prop].maxzoom;
+            //     if(z >= min && z <= max) {
+            //         result = obj[prop].tiles;
+            //
+            //     }
+            // }
+            resolve(obj[z]);
         });
 
     }).then(function(file){
 
         // setta il riferimento uri al file mbTile
-        var uri = MBtileUri.concat(__dirname, '/mbTiles/',file);
+        var uri = MBtileUri.concat(__dirname,mbtilespath,file);
         console.log(uri);
 
         // carica l'mbTile dal riferimento uri 

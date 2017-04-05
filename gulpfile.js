@@ -14,7 +14,7 @@ var geojsonpath = './geojson/';
 var tippecanoepath = 'tippecanoe/';
 var minpath = 'min/';
 var sourcemap = 'sourcemap.json';
-var mbtilespath = './mbtiles';
+var mbtilespath = 'mbtiles/';
 
 gulp.task('build',['loadgeojson','generatembtile']);
 
@@ -76,6 +76,9 @@ gulp.task('loadgeojson',function () {
                     return feature;
                 });
                 try{
+                    // cancello il file
+                    fs.unlinkSync(geojsonpath+tippecanoepath+file);
+                    // scrivo il file
                     fse.writeJsonSync(geojsonpath+tippecanoepath+file,newFeatures);
                 }catch (err){
                     console.error('ERROR: cannot generate file ',file, " in ", geojsonpath+tippecanoepath);
@@ -119,19 +122,21 @@ gulp.task('generatembtile',function() {
         if (file.search('.geojson') !== -1) {
             console.log('reading file ', file);
             var mbtilesfilename = file.slice(0,-8)+'.mbtiles';
-            var cmd = 'tippecanoe --output' +mbtilespath+mbtilesfilename+ ' --force --minimum-zoom=' + sources[file].minzoom + ' --maximum-zoom=' + sources[file].maxzoom + ' ' + geojsonpath+tippecanoepath+file;
+            var cmd = 'tippecanoe --output ' +mbtilespath+mbtilesfilename+ ' --force --minimum-zoom=' + sources[file].minzoom + ' --maximum-zoom=' + sources[file].maxzoom + ' ' + geojsonpath+tippecanoepath+file;
 
             var code = sh.exec(cmd).code;
             if(code === 0){
-                mbtiles[mbtilesfilename] = {
-                    maxzoom: sources[file].maxzoom,
-                    minzoom: sources[file].minzoom
-                };
+                var maxzoom = sources[file].maxzoom,
+                    minzoom = sources[file].minzoom;
+                for(var j = minzoom; j <= maxzoom; j++){
+                    mbtiles[j] = mbtilesfilename;
+                }
             }
             console.log('generating mbtiles from ',file,' with result: ', (code ===0) ?'ok': 'error code'+code);
         }
     }
     try{
+        fs.unlinkSync(mbtilespath+sourcemap);
         fse.writeJsonSync(mbtilespath+sourcemap,mbtiles);
     }catch (err){
         console.error('write file error ', err);
