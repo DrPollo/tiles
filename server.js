@@ -8,87 +8,37 @@ var fs = require('fs');
 var Promise = require('promise');
 
 var tilelive = require('@mapbox/tilelive');
-var Omnivore = require('@mapbox/tilelive-omnivore');
-var mbtile = require('mbtiles');
+var MBTiles = require('mbtiles');
 var path = require('path');
-var geojsonExtent = require('geojson-extent');
 
+var filepath = __dirname +'/mbTiles/mbTilesMap.json';
 
-var fd =  __dirname + '/geojson/level_13.geojson';
-var filepath = __dirname +'/geojson/tilemap.json';
-
-var omniUri = 'omnivore://';
-var uriMB = __dirname+'/output.mbtiles';
+var MBtileUri = 'mbtiles://';
 var VectorTile = require('vector-tile').VectorTile;
 var Protobuf  = require('pbf');
 var zlib = require('zlib');
 
-
-// new Omnivore(uri, function(err, source) {
-//   var readable = tilelive.createReadStream(source,{type:'pyramid',job:{total:4,num:1}, maxzoom:8, minzoom:8});
-//   var tile = new VerctorTile(new Protobuf(data) )
-//   new mbtile(uriMB, function(err,sink){
-//     var writable = tilelive.createWriteStream(sink);
-//     readable.pipe(writable);
-//   })
-//   source.getInfo(function(err, infgit o) {
-//     console.log(info);
-//   });
-// });
-
-/*----------------------------------------*/
-
-app.get('/render', function(req, res) {
-
-
-    var folder = fd;
-    fs.readFile(folder, 'utf8', function (err, data) {
-        if (err) throw err;
-        obj = JSON.parse(data);
-        console.log(geojsonExtent(obj));
-    });
-
-
-    // fs.readdir(folder, function(err, files){
-    //     if (err) {
-    //         throw err;
-    //     }
-    //     files.map(function (file) {
-    //         return path.join(folder, file);
-    //     }).filter(function (file) {
-    //         return fs.statSync(file).isFile();
-    //     }).forEach(function (file) {
-    //         console.log("%s (%s)", file, path.extname(file));
-    //         console.log(geojsonExtent(file));
-    //     });
-    //
-    //
-    // })
-
-});
-
+tilelive.protocols['mbtiles:'] = require('mbtiles');
 
 /* ----------------------------------------------------------------------
- /	read and return a tile in pbf format
- /	@params
- /	@output pbf layer
- //  to test
- //  http://localhost:3095/tile/z/13/x/4268/y/2944
+ /  read and return a tile from mbTiles - STEFANIA 
+ /  @params
+ /  @output mbTiles tile
  / ---------------------------------------------------------------------- */
 
 app.get('/tile/:z/:x/:y', function(req, res) {
-    //console.log(req.params);
 
+    // legge i parametri di z,x,y dalla chiamata GET
     var z = req.params.z;
     var x = req.params.x;
     var y = req.params.y;
 
     var zoom_map = filepath;
-    var z =  req.params.z;
     var obj;
 
     new Promise(function (resolve, reject) {
 
+    // Stabilisce quale file mbTile interrogare rispetto al mapping degli zoom sul file mbTilesMap.json
        fs.readFile(zoom_map, 'utf8', function (err, data) {
             if (err) throw err;
             var obj = JSON.parse(data);
@@ -98,6 +48,7 @@ app.get('/tile/:z/:x/:y', function(req, res) {
                 var max = obj[prop].maxzoom;
                 if(z >= min && z <= max) {
                     result = obj[prop].tiles;
+
                 }
             }
             resolve(result);
@@ -105,16 +56,19 @@ app.get('/tile/:z/:x/:y', function(req, res) {
 
     }).then(function(file){
 
-        var uri = omniUri.concat(__dirname, '/geojson/',file);
+        // setta il riferimento uri al file mbTile
+        var uri = MBtileUri.concat(__dirname, '/mbTiles/',file);
         console.log(uri);
 
-        new Omnivore(uri, function(err, src) {
+        // carica l'mbTile dal riferimento uri 
+        new MBTiles(uri, function(err, src) {
             try{
+                // recupera la tile sulle coordinate z, x, y
                 src.getTile(z, x, y, function(err, data){
-                    //src.getTile(13, 4268, 2944 , function(err, data){
-                    var pbf = new Protobuf(data);
-                    console.log('pbf' , pbf);
 
+                    // converte il formato restituito in un oggetto PBF (zip)
+                    var pbf = new Protobuf(data);
+            
                     // zlib.gunzip(data, function(err, unzipped) {
                     //     //console.log('unzipped',unzipped);
                     //     if (err) return res.send('no tile');
@@ -126,11 +80,12 @@ app.get('/tile/:z/:x/:y', function(req, res) {
                     //     // });
                     // });
 
+                    res.setHeader('Content-Encoding', 'gzip');
+                    res.setHeader('Access-Control-Allow-Origin','*');
+                    res.setHeader('Content-Type','application/x-protobuf');
+                    res.status(200).send(pbf);
                 });
-                res.setHeader('Content-Encoding', 'gzip');
-                res.setHeader('Access-Control-Allow-Origin:','*');
-                res.setHeader('Content-Type','application/x-protobuf');
-                return res.status(200).send(pbf.buf);
+
             }
             catch(err){
                 res.status(500).send('error');
