@@ -26,6 +26,14 @@ tilelive.protocols['mbtiles:'] = require('mbtiles');
  /  @output mbTiles tile
  / ---------------------------------------------------------------------- */
 
+// Stabilisce quale file mbTile interrogare rispetto al mapping degli zoom sul file mbTilesMap.json
+var obj = null;
+fs.readFile(filepath, 'utf8', function (err, data) {
+    if (err) throw err;
+    obj = JSON.parse(data);
+});
+
+
 app.get('/tile/:z/:x/:y', function(req, res) {
 
     // legge i parametri di z,x,y dalla chiamata GET
@@ -33,45 +41,38 @@ app.get('/tile/:z/:x/:y', function(req, res) {
     var x = req.params.x;
     var y = req.params.y;
 
-    var zoom_map = filepath;
-    var obj;
+    if(!obj){
+        console.error('cannot load source mapping')
+        return
+    }
 
-    new Promise(function (resolve, reject) {
 
-    // Stabilisce quale file mbTile interrogare rispetto al mapping degli zoom sul file mbTilesMap.json
-       fs.readFile(zoom_map, 'utf8', function (err, data) {
-            if (err) throw err;
-            var obj = JSON.parse(data);
-            resolve(obj[z]);
-        });
+    var file = obj[z];
 
-    }).then(function(file){
 
-        // setta il riferimento uri al file mbTile
-        var uri = MBtileUri.concat(__dirname,mbtilespath,file);
-        console.log(uri);
+    // setta il riferimento uri al file mbTile
+    var uri = MBtileUri.concat(__dirname,mbtilespath,file);
+    console.log(uri);
 
-        // carica l'mbTile dal riferimento uri 
-        new MBTiles(uri, function(err, src) {
-            try{
-                // recupera la tile sulle coordinate z, x, y
-                src.getTile(z, x, y, function(err, data){
+    // carica l'mbTile dal riferimento uri
+    new MBTiles(uri, function(err, src) {
+        try{
+            // recupera la tile sulle coordinate z, x, y
+            src.getTile(z, x, y, function(err, data){
 
-                    // converte il formato restituito in un oggetto PBF (zip)
-                    var pbf = data;
-                    // var pbf = new Protobuf(data);
-                    res.setHeader('Content-Encoding', 'gzip');
-                    res.setHeader('Access-Control-Allow-Origin','*');
-                    res.setHeader('Content-Type','application/x-protobuf');
-                    res.status(200).send(pbf);
-                });
+                // converte il formato restituito in un oggetto PBF (zip)
+                var pbf = data;
+                // var pbf = new Protobuf(data);
+                res.setHeader('Content-Encoding', 'gzip');
+                res.setHeader('Access-Control-Allow-Origin','*');
+                res.setHeader('Content-Type','application/x-protobuf');
+                res.status(200).send(pbf);
+            });
 
-            }
-            catch(err){
-                res.status(500).send('error');
-            }
-        });
-
+        }
+        catch(err){
+            res.status(500).send('error');
+        }
     });
 
 });
