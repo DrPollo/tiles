@@ -16,8 +16,10 @@ To test tileserver run:
 node server.js
 ```
 
-to test
+Query examples
+```
 http://localhost:3095/tile/10/533/368
 http://localhost:3095/tile/5/16/11
 http://localhost:3095/tile/12/2135/1472
 http://localhost:3095/tile/20/546668/376884
+```

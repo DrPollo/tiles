@@ -42,15 +42,6 @@ app.get('/tile/:z/:x/:y', function(req, res) {
        fs.readFile(zoom_map, 'utf8', function (err, data) {
             if (err) throw err;
             var obj = JSON.parse(data);
-            // var result ;
-            // for (var prop in obj) {
-            //     var min = obj[prop].minzoom;
-            //     var max = obj[prop].maxzoom;
-            //     if(z >= min && z <= max) {
-            //         result = obj[prop].tiles;
-            //
-            //     }
-            // }
             resolve(obj[z]);
         });
 
@@ -67,19 +58,8 @@ app.get('/tile/:z/:x/:y', function(req, res) {
                 src.getTile(z, x, y, function(err, data){
 
                     // converte il formato restituito in un oggetto PBF (zip)
-                    var pbf = new Protobuf(data);
-            
-                    // zlib.gunzip(data, function(err, unzipped) {
-                    //     //console.log('unzipped',unzipped);
-                    //     if (err) return res.send('no tile');
-                    //     var tile = new VectorTile(new Protobuf(unzipped));
-                    //     return res.status(200).send(tile.layers);
-
-                    //     // src.close(function(err){
-                    //     //     console.log(err);
-                    //     // });
-                    // });
-
+                    var pbf = data;
+                    // var pbf = new Protobuf(data);
                     res.setHeader('Content-Encoding', 'gzip');
                     res.setHeader('Access-Control-Allow-Origin','*');
                     res.setHeader('Content-Type','application/x-protobuf');
