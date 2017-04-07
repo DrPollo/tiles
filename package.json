@@ -26,6 +26,7 @@
   "devDependencies": {
     "fs": "0.0.1-security",
     "fs-extra": "^2.1.2",
+    "geobuf": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.1",
     "gulp-env": "^0.4.0",

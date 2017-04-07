@@ -16,7 +16,9 @@ var filepath = __dirname +mbtilespath+'sourcemap.json';
 var MBtileUri = 'mbtiles://';
 var VectorTile = require('vector-tile').VectorTile;
 var Protobuf  = require('pbf');
+var geobuf  = require('geobuf');
 var zlib = require('zlib');
+var mapnik = require('mapnik');
 
 tilelive.protocols['mbtiles:'] = require('mbtiles');
 
@@ -60,13 +62,19 @@ app.get('/tile/:z/:x/:y', function(req, res) {
             // recupera la tile sulle coordinate z, x, y
             src.getTile(z, x, y, function(err, data){
 
-                // converte il formato restituito in un oggetto PBF (zip)
-                var pbf = data;
-                // var pbf = new Protobuf(data);
-                res.setHeader('Content-Encoding', 'gzip');
                 res.setHeader('Access-Control-Allow-Origin','*');
+
+
+                // todo invio tile vuota
+                // se non trovo la tile
+                if(err){
+                    return res.status(404).send({message:'Missing tile'});
+                }
+
+                // console.log('getTile',z,x,y,data);
                 res.setHeader('Content-Type','application/x-protobuf');
-                res.status(200).send(pbf);
+                res.setHeader('Content-Encoding', 'gzip');
+                res.status(200).send(data);
             });
 
         }
@@ -78,20 +86,11 @@ app.get('/tile/:z/:x/:y', function(req, res) {
 });
 
 
-/* ----------------------------------------------------------------------
- /	description
- /	@params
- /	@output
- / ---------------------------------------------------------------------- */
-
-// respond with "hello world" when a GET request is made to the homepage
+// init tile server
 app.get('/', function(req, res) {
     res.send('Tile server is running');
 });
-
-
-
-
+// listner on port
 app.listen(3095, function () {
     console.log('Tile server is running on port: 3095');
 });
