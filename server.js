@@ -2,10 +2,8 @@
  /	express
  / ---------------------------------------------------------------------- */
 var express = require('express');
-var router = express.Router();
 var app = express();
 var fs = require('fs');
-var Promise = require('promise');
 
 var tilelive = require('@mapbox/tilelive');
 var MBTiles = require('mbtiles');
@@ -14,11 +12,7 @@ var mbtilespath = '/mbtiles/';
 var filepath = __dirname +mbtilespath+'sourcemap.json';
 
 var MBtileUri = 'mbtiles://';
-var VectorTile = require('vector-tile').VectorTile;
-var Protobuf  = require('pbf');
-var geobuf  = require('geobuf');
 var zlib = require('zlib');
-var mapnik = require('mapnik');
 
 tilelive.protocols['mbtiles:'] = require('mbtiles');
 
