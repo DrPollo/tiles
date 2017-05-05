@@ -14,12 +14,17 @@ var geojsonpath = './geojson/';
 var tippecanoepath = 'tippecanoe/';
 var minpath = 'min/';
 var sourcemap = 'sourcemap.json';
+var admin_level_map = 'admin_level_map.json';
 var mbtilespath = 'mbtiles/';
+var polygonCenter = require('geojson-polygon-center');
+var geojsonArea = require('geojson-area');
 
-gulp.task('build',['loadgeojson','generatembtile']);
+gulp.task('build',['load_static_geojson','load_osm_geojson','generatembtile']);
+//gulp.task('build',['load_static_geojson','load_osm_geojson']);
 
+gulp.task('load_static_geojson',function () {
 
-gulp.task('loadgeojson',function () {
+    console.log('/*********load_static_geojson*********/')
     // carico i file environment
     try {
         var sources = fse.readJsonSync(geojsonpath+sourcemap);
@@ -31,9 +36,10 @@ gulp.task('loadgeojson',function () {
         });
     }
 
-    // carico i file geosjon
+    // carico i file geosjon "statici"
     try {
-        var files = fs.readdirSync(geojsonpath);
+        var static_dir = geojsonpath + "/static/"
+        var static_files = fs.readdirSync(static_dir);
     } catch (err) {
         console.error('directory read error ', err);
         throw new gutil.PluginError({
@@ -41,51 +47,84 @@ gulp.task('loadgeojson',function () {
             message: geojsonpath+" directory read error"
         });
     }
-    console.log('files to read: ',files.length);
+
+    console.log('files to read: ',static_files.length);
     // creo le directory per i file
     fse.ensureDirSync(geojsonpath+tippecanoepath);
-    // ciclo i file
-    for(var i in files) {
-        var file = files[i];
+
+    // ciclo i file in static
+    for(var i in static_files) {
+        var file = static_files[i];
         if(file.search('.geojson') !== -1 ) {
-            console.log('reading file ',file);
+            console.log('reading static file ',file);
 
-            try{
-                // carico e parsifico il file
-                var features = fse.readJsonSync(geojsonpath+file).features;
-                var ok = true;
-            }catch (err){
-                console.error('error ',err,' loading ',geojsonpath+file);
-            }
+            if(file in sources){
 
-            if(ok){
-                var newFeatures = features.map(function(feature){
-                    feature['tippecanoe'] = {
-                        "maxzoom" : sources[file].maxzoom,
-                        "minzoom" : sources[file].minzoom,
-                        "layer" : sources[file].layer
-                    };
-                    try {
-                        delete feature.properties.bbox;
-                        delete feature.properties.geometry;
-                        delete feature.properties.zoom_min;
-                        delete feature.properties.zoom_max;
-                    }catch (err){
-
-                    }
-                    return feature;
-                });
-                try {
-                    // cancello il file
-                    fs.unlinkSync(geojsonpath+tippecanoepath+file);
-                }catch (err){
-                    console.log('nothing to delete');
-                }
                 try{
-                    // scrivo il file
-                    fse.writeJsonSync(geojsonpath+tippecanoepath+file,newFeatures);
+                    // carico e parsifico il file
+                    var features = fse.readJsonSync(static_dir+file).features;
+                    var ok = true;
                 }catch (err){
-                    console.error('ERROR: cannot generate file ',file, " in ", geojsonpath+tippecanoepath);
+                    console.error('error ',err,' loading ',static_dir+file);
+                }
+
+                if(ok){
+                    var newFeatures = features.map(function(feature){
+                        feature['tippecanoe'] = {
+                            "maxzoom" : sources[file].maxzoom,
+                            "minzoom" : sources[file].minzoom,
+                            "layer" : sources[file].layer
+                        };
+                        try {
+                            delete feature.properties.bbox;
+                            delete feature.properties.geometry;
+                            delete feature.properties.zoom_min;
+                            delete feature.properties.zoom_max;
+                        }catch (err){
+
+                        }
+                        return feature;
+                    });
+
+                    var newFeaturesLabels = features.map(function(feature){
+
+                        var center = polygonCenter(feature.geometry);
+
+                        feature.geometry = center;
+
+                        feature['tippecanoe'] = {
+                            "maxzoom" : sources[file].maxzoom,
+                            "minzoom" : sources[file].minzoom,
+                            "layer" : sources[file].layer+"_labels"
+                        };
+
+                        try {
+                            delete feature.properties.bbox;
+                            delete feature.properties.geometry;
+                            delete feature.properties.zoom_min;
+                            delete feature.properties.zoom_max;
+                        }catch (err){
+
+                        }
+                        return feature;
+                    });
+
+                    try {
+                        // cancello il file
+                        fs.unlinkSync(geojsonpath+tippecanoepath+file);
+                        // cancello il file _labels
+                        fs.unlinkSync(geojsonpath+tippecanoepath+"labels_"+file);
+                    }catch (err){
+                        console.log('nothing to delete');
+                    }
+                    try{
+                        // scrivo il file
+                        fse.writeJsonSync(geojsonpath+tippecanoepath+file,newFeatures);
+                        // scrivo il file _labels
+                        fse.writeJsonSync(geojsonpath+tippecanoepath+"labels_"+file,newFeaturesLabels);
+                    }catch (err){
+                        console.error('ERROR: cannot generate file ',file, " in ", geojsonpath+tippecanoepath);
+                    }
                 }
             }
 
@@ -94,10 +133,154 @@ gulp.task('loadgeojson',function () {
 
 });
 
-gulp.task('generatembtile',function() {
+gulp.task('load_osm_geojson',function () {
+    console.log('/*********load_osm_geojson*********/')
     // carico i file environment
     try {
         var sources = fse.readJsonSync(geojsonpath+sourcemap);
+    } catch (err) {
+        console.error('directory read error ', err);
+        throw new gutil.PluginError({
+            plugin: 'readFileSync',
+            message: geojsonpath+sourcemap+" read error"
+        });
+    }
+
+    // carico i file geosjon "osm"
+    try {
+        var osm_dir = geojsonpath + "/osm/"
+        var osm_files = fs.readdirSync(osm_dir);
+    } catch (err) {
+        console.error('directory read error ', err);
+        throw new gutil.PluginError({
+            plugin: 'readdireSync',
+            message: geojsonpath+" directory read error"
+        });
+    }
+
+    console.log('files to read: ',osm_files.length);
+    // creo le directory per i file
+    fse.ensureDirSync(geojsonpath+tippecanoepath);
+
+    // ciclo i file in static
+    for(var i in osm_files) {
+        var file = osm_files[i];
+        if(file.search('.geojson') !== -1 ) {
+            console.log('reading osm file ',file);
+
+            if(file in sources){
+
+                try{
+                    // carico e parsifico il file
+                    var features = fse.readJsonSync(osm_dir+file).features;
+                    var ok = true;
+                }catch (err){
+                    console.error('error ',err,' loading ',osm_dir+file);
+                }
+
+                if(ok){
+                    var newFeatures = features.map(function(feature){
+                        feature['tippecanoe'] = {
+                            "maxzoom" : sources[file].maxzoom,
+                            "minzoom" : sources[file].minzoom,
+                            "layer" : sources[file].layer
+                        };
+                        try {
+                            delete feature.properties.bbox;
+                            delete feature.properties.geometry;
+                            delete feature.properties.zoom_min;
+                            delete feature.properties.zoom_max;
+                        }catch (err){
+
+                        }
+                        return feature;
+                    });
+
+                    var newFeaturesLabels = features.map(function(feature){
+
+                        var geoType = feature.geometry.type;
+                        var geom=feature.geometry;
+                        var area = 0;
+                        var max_area = 0
+
+                        if(geoType.toUpperCase() === "MULTIPOLYGON"){
+                            for (var i=0; i < geom.coordinates.length; i++){
+                                  var polygon = {
+                                       'type':'Polygon', 
+                                       'coordinates':geom.coordinates[i]};
+
+                                  area = geojsonArea.geometry(polygon);
+
+                                  if(area > max_area){
+                                       max_area = area;
+                                       var center = polygonCenter(polygon);
+                                  }
+                              }
+                        }
+                        else{
+                            var center = polygonCenter(feature.geometry);
+                        }
+                            
+
+                        feature.geometry = center;
+
+                        feature['tippecanoe'] = {
+                            "maxzoom" : sources[file].maxzoom,
+                            "minzoom" : sources[file].minzoom,
+                            "layer" : sources[file].layer+"_labels"
+                        };
+
+                        try {
+                            delete feature.properties.bbox;
+                            delete feature.properties.geometry;
+                            delete feature.properties.geom;
+                            delete feature.properties.zoom_min;
+                            delete feature.properties.zoom_max;
+                        }catch (err){
+
+                        }
+                        return feature;
+                    });
+                    try {
+                        // cancello il file
+                        //fs.unlinkSync(geojsonpath+tippecanoepath+file);
+                        // cancello il file _labels
+                        fs.unlinkSync(geojsonpath+tippecanoepath+"labels_"+file);
+                    }catch (err){
+                        console.log('nothing to delete');
+                    }
+                    try{
+                        // scrivo il file
+                        //fse.writeJsonSync(geojsonpath+tippecanoepath+file,newFeatures);
+                        // scrivo il file _labels
+                        fse.writeJsonSync(geojsonpath+tippecanoepath+"labels_"+file,newFeaturesLabels);
+                    }catch (err){
+                        console.error('ERROR: cannot generate file ',file, " in ", geojsonpath+tippecanoepath);
+                    }
+                }
+            }
+
+        }
+    }
+});
+
+gulp.task('generatembtile',function() {
+    console.log('/*********generatembtile*********/')
+
+    // carico i file environment
+    try {
+        var sources = fse.readJsonSync(geojsonpath+sourcemap);
+    } catch (err) {
+        console.error('directory read error ', err);
+        throw new gutil.PluginError({
+            plugin: 'readFileSync',
+            message: geojsonpath+sourcemap+" read error"
+        });
+    }
+
+    // carico il file di admin_level_map
+    try {
+        var admin_map = fse.readJsonSync(geojsonpath+admin_level_map);
     } catch (err) {
         console.error('directory read error ', err);
         throw new gutil.PluginError({
@@ -116,28 +299,36 @@ gulp.task('generatembtile',function() {
             message: geojsonpath + tippecanoepath + " directory read error"
         });
     }
+
     console.log('files to read: ', files.length);
     // creo le directory per i file
     fse.ensureDirSync(mbtilespath);
-    var mbtiles = {};
-    // ciclo i file
-    for (var i in files) {
-        var file = files[i];
-        if (file.search('.geojson') !== -1) {
-            console.log('reading file ', file);
-            var mbtilesfilename = file.slice(0,-8)+'.mbtiles';
-            var cmd = 'tippecanoe --output ' +mbtilespath+mbtilesfilename+ ' --force --minimum-zoom=' + sources[file].minzoom + ' --maximum-zoom=' + sources[file].maxzoom + ' ' + geojsonpath+tippecanoepath+file;
 
+    var mbtiles = {};
+
+    // ciclo il mapping
+    for (var i in admin_map) {
+
+        var mbtilesfilename = i;
+
+        var cmd = 'tippecanoe --output ' +mbtilespath+mbtilesfilename+ ' --force --minimum-zoom=' + admin_map[i].minzoom + ' --maximum-zoom=' + admin_map[i].maxzoom;
+
+        for(var f in admin_map[i].files){
+            console.log('reading file ', admin_map[i].files[f]);
+            cmd = cmd + ' ' + geojsonpath+tippecanoepath+admin_map[i].files[f];
+        }
             var code = sh.exec(cmd).code;
+
             if(code === 0){
-                var maxzoom = sources[file].maxzoom,
-                    minzoom = sources[file].minzoom;
+                var maxzoom = admin_map[i].maxzoom,
+                    minzoom = admin_map[i].minzoom;
                 for(var j = minzoom; j <= maxzoom; j++){
                     mbtiles[j] = mbtilesfilename;
                 }
             }
-            console.log('generating mbtiles from ',file,' with result: ', (code ===0) ?'ok': 'error code'+code);
-        }
+            else exit;
+
+            console.log('generating mbtiles from ',cmd,' with result: ', (code ===0) ?'ok': 'error code'+code);
     }
     try {
         fs.unlinkSync(mbtilespath + sourcemap);

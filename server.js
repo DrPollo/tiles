@@ -58,7 +58,7 @@ app.get('/tile/:z/:x/:y', function(req, res) {
 
                 res.setHeader('Access-Control-Allow-Origin','*');
 
-
+                console.log(err, data)
                 // todo invio tile vuota
                 // se non trovo la tile
                 if(err){
