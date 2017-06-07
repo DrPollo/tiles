@@ -1,9 +1,0 @@
-{
-"type": "FeatureCollection",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-                                                                                
-"features": [
-{ "type": "Feature", "properties": { "id": 1.000000, "osm_id": 167374067.000000, "name": null, "type": "all", "addr:stree": null, "addr:postc": null, "addr:city": null, "addr:inclu": null }, "geometry": { "type": "LineString", "coordinates": [ [ 7.577646530659081, 45.062593758982445 ], [ 7.577858760447412, 45.062621754539066 ] ] } },
-{ "type": "Feature", "properties": { "id": 2.000000, "osm_id": 167374068.000000, "name": null, "type": "all", "addr:stree": null, "addr:postc": null, "addr:city": null, "addr:inclu": null }, "geometry": { "type": "LineString", "coordinates": [ [ 7.577990775422421, 45.062642876935058 ], [ 7.578425041825825, 45.062697443124705 ] ] } }
-]
-}

@@ -1,47 +1,120 @@
 {
-    "admin_level_1.mbtiles" : {
+    "level_1_2.mbtiles" : {
     "minzoom": 1,
-    "maxzoom": 3,
-    "files": ["world_countries_level_1.geojson","label_world_countries_level_1.geojson"]
+    "maxzoom": 2,
+    "files": [
+      "world_countries_level_1.geojson",
+      "label_world_countries_level_1.geojson"
+      ]
   },
-  "admin_level_4.mbtiles" : {
-    "minzoom": 4,
-    "maxzoom": 5,
-    "files": ["regioni_europa_level_4.geojson","labels_regioni_europa_level_4.geojson"]
+  "level_3_4.mbtiles" : {
+    "minzoom": 3,
+    "maxzoom": 4,
+    "files": [
+      "regioni_europa_level_4.geojson",
+      "labels_regioni_europa_level_4.geojson"
+      ]
   },
-  "admin_level_6.mbtiles" : {
-    "minzoom": 6,
-    "maxzoom": 7,
-    "files": ["province_europa_level_6.geojson","labels_province_europa_level_6.geojson"]
+  "level_5_6.mbtiles" : {
+    "minzoom": 5,
+    "maxzoom": 6,
+    "files": [
+      "province_europa_level_6.geojson",
+      "labels_province_europa_level_6.geojson"
+      ]
   },
-  "admin_level_8.mbtiles" : {
-    "minzoom": 8,
+  "level_7_8.mbtiles" : {
+    "minzoom": 7,
+    "maxzoom": 8,
+    "files": [
+      "province_europa_level_6.geojson",
+      "comuni_italia_level_8.geojson",
+      "labels_comuni_italia_level_8.geojson"
+      ]
+  },
+    "level_9_10.mbtiles" : {
+    "minzoom": 9,
     "maxzoom": 10,
-    "files": ["comuni_italia_level_8.geojson","labels_comuni_italia_level_8.geojson"]
+    "files": [
+      "province_europa_level_6.geojson",
+      "comuni_italia_level_8.geojson",
+      "labels_comuni_italia_level_8.geojson"
+      ]
   },
-  "admin_level_10.mbtiles" : {
+  "level_11_12.mbtiles" : {
     "minzoom": 11,
     "maxzoom": 12,
-    "files": ["circoscrizione_level_10.geojson","labels_circoscrizione_level_10.geojson"]
+    "files": [
+      "circoscrizione_level_10.geojson",
+      "quartiere_level_13.geojson",
+      "labels_circoscrizione_level_10.geojson",
+      "labels_quartiere_level_13.geojson"
+      ]
   },
-  "admin_level_13.mbtiles": {
+  "level_13_14.mbtiles": {
     "minzoom": 13,
     "maxzoom": 14,
-    "files": ["quartiere_level_13.geojson","labels_quartiere_level_13.geojson"]
+    "files": [
+      "quartiere_level_13.geojson",
+      "labels_quartiere_level_13.geojson"
+      ]
   },
-  "admin_level_14.mbtiles" : {
+  "level_15_16.mbtiles" : {
     "minzoom": 15,
     "maxzoom": 16,
-    "files": ["city_block_level_14.geojson","labels_city_block_level_14.geojson"]
+    "files": [
+      "city_block_level_14.geojson",
+      "site_level_16.geojson",
+      "turin_italy_buildings.geojson",
+      "turin_italy_roads.geojson",
+      "turin_italy_waterareas.geojson",
+      "turin_italy_waterways.geojson",
+      "turin_italy_landusages.geojson",
+      "labels_city_block_level_14.geojson",
+      "labels_site_level_16.geojson",
+      "labels_turin_italy_buildings.geojson",
+      "labels_turin_italy_roads.geojson",
+      "labels_turin_italy_waterareas.geojson",
+      "labels_turin_italy_waterways.geojson",
+      "labels_turin_italy_landusages.geojson"
+      ]
   },
-  "admin_level_16.mbtiles" : {
+  "level_17_18.mbtiles" : {
     "minzoom": 17,
     "maxzoom": 18,
-    "files": ["site_level_16.geojson","turin_italy_buildings.geojson","labels_site_level_16.geojson","labels_turin_italy_buildings.geojson"]
+    "files": [
+      "site_level_16.geojson",
+      "turin_italy_buildings.geojson",
+      "turin_italy_roads.geojson",
+      "turin_italy_waterareas.geojson",
+      "turin_italy_waterways.geojson",
+      "turin_italy_landusages.geojson",
+      "labels_site_level_16.geojson",
+      "labels_turin_italy_buildings.geojson",
+      "labels_turin_italy_roads.geojson",
+      "labels_turin_italy_waterareas.geojson",
+      "labels_turin_italy_waterways.geojson",
+      "labels_turin_italy_landusages.geojson"
+      ]
   },
-  "admin_level_18.mbtiles" : {
+  "level_19_20.mbtiles" : {
     "minzoom": 19,
     "maxzoom": 20,
-    "files": ["indoor_level_18.geojson","labels_indoor_level_18.geojson"]
+    "files": [
+      "indoor_level_18.geojson",
+      "site_level_16.geojson",
+      "turin_italy_buildings.geojson",
+      "turin_italy_roads.geojson",
+      "turin_italy_waterareas.geojson",
+      "turin_italy_waterways.geojson",
+      "turin_italy_landusages.geojson",
+      "labels_indoor_level_18.geojson",
+      "labels_site_level_16.geojson",
+      "labels_turin_italy_buildings.geojson",
+      "labels_turin_italy_roads.geojson",
+      "labels_turin_italy_waterareas.geojson",
+      "labels_turin_italy_waterways.geojson",
+      "labels_turin_italy_landusages.geojson"
+      ]
   }
 }

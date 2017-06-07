@@ -20,7 +20,7 @@ var polygonCenter = require('geojson-polygon-center');
 var geojsonArea = require('geojson-area');
 
 gulp.task('build',['load_static_geojson','load_osm_geojson','generatembtile']);
-//gulp.task('build',['load_static_geojson','load_osm_geojson']);
+//gulp.task('build',['load_osm_geojson','generatembtile']);
 
 gulp.task('load_static_geojson',function () {
 
@@ -148,7 +148,7 @@ gulp.task('load_osm_geojson',function () {
 
     // carico i file geosjon "osm"
     try {
-        var osm_dir = geojsonpath + "/osm/"
+        var osm_dir = geojsonpath + "/turin_italy_osm_geojson/"
         var osm_files = fs.readdirSync(osm_dir);
     } catch (err) {
         console.error('directory read error ', err);
@@ -243,7 +243,7 @@ gulp.task('load_osm_geojson',function () {
                     });
                     try {
                         // cancello il file
-                        //fs.unlinkSync(geojsonpath+tippecanoepath+file);
+                        fs.unlinkSync(geojsonpath+tippecanoepath+file);
                         // cancello il file _labels
                         fs.unlinkSync(geojsonpath+tippecanoepath+"labels_"+file);
                     }catch (err){
@@ -251,7 +251,7 @@ gulp.task('load_osm_geojson',function () {
                     }
                     try{
                         // scrivo il file
-                        //fse.writeJsonSync(geojsonpath+tippecanoepath+file,newFeatures);
+                        fse.writeJsonSync(geojsonpath+tippecanoepath+file,newFeatures);
                         // scrivo il file _labels
                         fse.writeJsonSync(geojsonpath+tippecanoepath+"labels_"+file,newFeaturesLabels);
                     }catch (err){
@@ -311,7 +311,7 @@ gulp.task('generatembtile',function() {
 
         var mbtilesfilename = i;
 
-        var cmd = 'tippecanoe --output ' +mbtilespath+mbtilesfilename+ ' --force --minimum-zoom=' + admin_map[i].minzoom + ' --maximum-zoom=' + admin_map[i].maxzoom;
+        var cmd = 'tippecanoe --output ' +mbtilespath+mbtilesfilename+ ' --force -pf -pk --minimum-zoom=' + admin_map[i].minzoom + ' --maximum-zoom=' + admin_map[i].maxzoom;
 
         for(var f in admin_map[i].files){
             console.log('reading file ', admin_map[i].files[f]);
