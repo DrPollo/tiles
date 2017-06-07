@@ -19,8 +19,8 @@ var mbtilespath = 'mbtiles/';
 var polygonCenter = require('geojson-polygon-center');
 var geojsonArea = require('geojson-area');
 
-gulp.task('build',['load_static_geojson','load_osm_geojson','generatembtile']);
-//gulp.task('build',['load_osm_geojson','generatembtile']);
+//gulp.task('build',['load_static_geojson','load_osm_geojson','generatembtile']);
+gulp.task('build',['load_static_geojson','load_osm_geojson']);
 
 gulp.task('load_static_geojson',function () {
 
@@ -86,6 +86,20 @@ gulp.task('load_static_geojson',function () {
                         return feature;
                     });
 
+                    try {
+                        // cancello il file
+                        fs.unlinkSync(geojsonpath+tippecanoepath+file);
+
+                    }catch (err){
+                        console.log('nothing to delete');
+                    }
+                    try{
+                        // scrivo il file
+                        fse.writeJsonSync(geojsonpath+tippecanoepath+file,newFeatures);
+                    }catch (err){
+                        console.error('ERROR: cannot generate file ',file, " in ", geojsonpath+tippecanoepath);
+                    }
+
                     var newFeaturesLabels = features.map(function(feature){
 
                         var center = polygonCenter(feature.geometry);
@@ -110,21 +124,18 @@ gulp.task('load_static_geojson',function () {
                     });
 
                     try {
-                        // cancello il file
-                        fs.unlinkSync(geojsonpath+tippecanoepath+file);
                         // cancello il file _labels
                         fs.unlinkSync(geojsonpath+tippecanoepath+"labels_"+file);
                     }catch (err){
                         console.log('nothing to delete');
                     }
                     try{
-                        // scrivo il file
-                        fse.writeJsonSync(geojsonpath+tippecanoepath+file,newFeatures);
                         // scrivo il file _labels
                         fse.writeJsonSync(geojsonpath+tippecanoepath+"labels_"+file,newFeaturesLabels);
                     }catch (err){
                         console.error('ERROR: cannot generate file ',file, " in ", geojsonpath+tippecanoepath);
                     }
+
                 }
             }
 
@@ -196,6 +207,21 @@ gulp.task('load_osm_geojson',function () {
                         return feature;
                     });
 
+                    try {
+                        // cancello il file
+                        fs.unlinkSync(geojsonpath+tippecanoepath+file);
+                  
+                    }catch (err){
+                        console.log('nothing to delete');
+                    }
+                    try{
+                        // scrivo il file
+                        fse.writeJsonSync(geojsonpath+tippecanoepath+file,newFeatures);
+                       
+                    }catch (err){
+                        console.error('ERROR: cannot generate file ',file, " in ", geojsonpath+tippecanoepath);
+                    }
+
                     var newFeaturesLabels = features.map(function(feature){
 
                         var geoType = feature.geometry.type;
@@ -242,16 +268,12 @@ gulp.task('load_osm_geojson',function () {
                         return feature;
                     });
                     try {
-                        // cancello il file
-                        fs.unlinkSync(geojsonpath+tippecanoepath+file);
                         // cancello il file _labels
                         fs.unlinkSync(geojsonpath+tippecanoepath+"labels_"+file);
                     }catch (err){
                         console.log('nothing to delete');
                     }
                     try{
-                        // scrivo il file
-                        fse.writeJsonSync(geojsonpath+tippecanoepath+file,newFeatures);
                         // scrivo il file _labels
                         fse.writeJsonSync(geojsonpath+tippecanoepath+"labels_"+file,newFeaturesLabels);
                     }catch (err){
