@@ -10,7 +10,7 @@
     "layer":"regioni"
   },
   "province_europa_level_6.geojson": {
-    "minzoom": 7,
+    "minzoom": 8,
     "maxzoom": 10,
     "layer":"provincie"
   },
@@ -21,7 +21,7 @@
   },
   "circoscrizione_level_10.geojson": {
     "minzoom": 11,
-    "maxzoom": 13,
+    "maxzoom": 14,
     "layer":"circoscrizioni"
   },
   "quartiere_level_13.geojson": {

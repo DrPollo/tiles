@@ -19,8 +19,7 @@ var mbtilespath = 'mbtiles/';
 var polygonCenter = require('geojson-polygon-center');
 var geojsonArea = require('geojson-area');
 
-//gulp.task('build',['load_static_geojson','load_osm_geojson','generatembtile']);
-gulp.task('build',['load_static_geojson','load_osm_geojson']);
+gulp.task('build',['load_static_geojson','load_osm_geojson','generatembtile']);
 
 gulp.task('load_static_geojson',function () {
 
@@ -333,7 +332,7 @@ gulp.task('generatembtile',function() {
 
         var mbtilesfilename = i;
 
-        var cmd = 'tippecanoe --output ' +mbtilespath+mbtilesfilename+ ' --force -pf -pk --minimum-zoom=' + admin_map[i].minzoom + ' --maximum-zoom=' + admin_map[i].maxzoom;
+        var cmd = 'tippecanoe --output ' +mbtilespath+mbtilesfilename+ ' --force -pf -pk --minimum-zoom=' + admin_map[i].minzoom + ' --maximum-zoom=' + admin_map[i].maxzoom + ' --preserve-input-order ';
 
         for(var f in admin_map[i].files){
             console.log('reading file ', admin_map[i].files[f]);
