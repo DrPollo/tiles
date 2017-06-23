@@ -16,22 +16,22 @@
   },
   "comuni_italia_level_8.geojson": {
     "minzoom": 10,
-    "maxzoom": 12,
+    "maxzoom": 13,
     "layer":"comuni"
   },
   "circoscrizione_level_10.geojson": {
     "minzoom": 11,
-    "maxzoom": 14,
+    "maxzoom": 16,
     "layer":"circoscrizioni"
   },
   "quartiere_level_13.geojson": {
-    "minzoom": 12,
-    "maxzoom": 14,
+    "minzoom": 13,
+    "maxzoom": 16,
     "layer":"quartieri"
   },
   "city_block_level_14.geojson": {
     "minzoom": 15,
-    "maxzoom": 16,
+    "maxzoom": 17,
     "layer":"city_block"
   },
   "site_level_16.geojson": {
@@ -45,7 +45,7 @@
     "layer":"building"
   },
   "turin_italy_landusages.geojson": {
-    "minzoom": 15,
+    "minzoom": 10,
     "maxzoom": 20,
     "layer":"landusages"
   },
@@ -55,12 +55,12 @@
     "layer":"roads"
   },
     "turin_italy_waterareas.geojson": {
-    "minzoom": 15,
+    "minzoom": 10,
     "maxzoom": 20,
     "layer":"waterareas"
   },
   "turin_italy_waterways.geojson": {
-    "minzoom": 15,
+    "minzoom": 10,
     "maxzoom": 20,
     "layer":"waterways"
   },
