@@ -5,3 +5,4 @@ output.mbtiles
  geojson/**/*.geojson
  geojson/tippecanoe
  .DS_Store
+ package-lock.json
