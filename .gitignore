@@ -1,8 +1,8 @@
 node_modules
 output.mbtiles
-.idea
- mbtiles/*
+.idea/**/*
+ mbtiles/**/*
  geojson/**/*.geojson
- geojson/tippecanoe
+ geojson/tippecanoe/**/*
  .DS_Store
  package-lock.json
