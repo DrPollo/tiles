@@ -13,7 +13,7 @@
       "world_countries_level_1.geojson"
       ]
   },
-  "level_5_6.mbtiles" : {
+  "level_5_7.mbtiles" : {
     "minzoom": 5,
     "maxzoom": 7,
     "files": [
@@ -78,13 +78,13 @@
     "minzoom": 19,
     "maxzoom": 20,
     "files": [
-      "indoor_level_18.geojson",
       "site_level_16.geojson",
       "turin_italy_buildings.geojson",
       "turin_italy_roads.geojson",
       "turin_italy_waterareas.geojson",
       "turin_italy_waterways.geojson",
-      "turin_italy_landusages.geojson"
+      "turin_italy_landusages.geojson",
+      "indoor_level_18.geojson"
       ]
   }
 }
