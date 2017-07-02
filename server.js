@@ -9,7 +9,7 @@ var tilelive = require('@mapbox/tilelive');
 var MBTiles = require('mbtiles');
 var path = require('path');
 var mbtilespath = '/mbtiles/';
-//var filepath = __dirname + mbtilespath + 'sourcemap.json';
+var filepath = __dirname + mbtilespath + 'sourcemap.json';
 
 var MBtileUri = 'mbtiles://';
 var zlib = require('zlib');
@@ -56,11 +56,10 @@ MongoClient.connect(url, {
 
 // Stabilisce quale file mbTile interrogare rispetto al mapping degli zoom sul file mbTilesMap.json
 var obj = null;
-/*fs.readFile(filepath, 'utf8', function (err, data) {
+fs.readFile(filepath, 'utf8', function (err, data) {
     if (err) throw err;
     obj = JSON.parse(data);
-});*/
-
+});
 
 app.get('/tile/:z/:x/:y', function (req, res) {
 
@@ -119,11 +118,10 @@ app.get('/tile/:z/:x/:y', function (req, res) {
 
 // Stabilisce quale file mbTile interrogare rispetto al mapping degli zoom sul file mbTilesMap.json
 var obj = null;
-/*fs.readFile(filepath, 'utf8', function (err, data) {
+fs.readFile(filepath, 'utf8', function (err, data) {
     if (err) throw err;
     obj = JSON.parse(data);
-});*/
-
+});
 
 app.get('/area/:z/:x_lon/:y_lat', function (req, res) {
 
