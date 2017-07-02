@@ -271,7 +271,7 @@ app.get('/areas/content/:id', function (req, res) {
     var areaId = req.params.id;
 
     session
-        .run('MATCH (container:Areas {areaId:$id})<-[r:PART_OF]-(content) WHERE content.zIndex=3 return content.areaId as areaId, content.geojson as geojson', {id:areaId})
+        .run('MATCH (container:Areas {areaId:$id})<-[r:PART_OF]-(content) return content.areaId as areaId, content.geojson as geojson', {id:areaId})
         .then(function (result) {
             var rst={
                 type:"FeatureCollection",
