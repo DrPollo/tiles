@@ -1,0 +1,9 @@
+create a mongodb collection containing all areas
+
+install neo4j
+configure username and password
+
+update script parameters at the beginning of the ProcessAreasInverse.py file
+
+launch
+python ProcessAreaInverse.py

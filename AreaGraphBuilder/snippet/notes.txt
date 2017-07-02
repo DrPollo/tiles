@@ -1,0 +1,21 @@
+db.areas.createIndex({"properties.zoom_min":1});
+db.areas.createIndex({"properties.zoom_max":1});
+
+
+
+MATCH (a:Areas)
+RETURN a.name, size((:Areas)-[:PART_OF]->(a)) AS el
+ORDER BY el DESC
+LIMIT 5;
+
+MATCH (a:Areas)
+RETURN a.name,a.zoom_min,a.zoom_max, size((:Areas)-[:PART_OF]->(a)) AS el
+ORDER BY el DESC
+LIMIT 20;
+
+
+
+MATCH (container:Areas {areaId:"a631fece-5656-11e7-969c-cd190e3528e8"})<-[:PART_OF|INTERSECTS]-(content)
+RETURN container.name,content.name
+
+create index on :Areas(areaId)
