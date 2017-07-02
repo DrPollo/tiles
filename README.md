@@ -30,3 +30,9 @@ http://localhost:3090/tile/12/2135/1472
 Get Area from point : z/lon/lat
 
 http://localhost:3090/area/12/7.692607641220094/45.08807547183474
+
+
+Get areas
+http://localhost:3090/areas/content/:areaId
+
+example: http://localhost:3090/areas/content/88fba3ae-5820-11e7-b54e-c57635f3f5a1
