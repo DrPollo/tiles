@@ -271,6 +271,10 @@ app.get('/areas/:id', function (req, res) {
         });
 });
 
+app.get('/',function (req,res) {
+    return res.status(200).send('ok');
+});
+
 // gestione aree contenute
 app.get('/areas/content/:id', function (req, res) {
 
