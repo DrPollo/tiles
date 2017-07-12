@@ -346,8 +346,8 @@ app.get('/', function (req, res) {
     res.send('Tile server is running');
 });
 // listner on port
-app.listen(3096, function () {
-    console.log('Tile server is running on port: 3096');
+app.listen(3095, function () {
+    console.log('Tile server is running on port: 3095');
 });
 
 
