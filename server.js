@@ -11,7 +11,6 @@ app.use(cors({
     "optionsSuccessStatus": 204
 }));
 
-
 var fs = require('fs');
 var sh = require('shelljs');
 var tilelive = require('@mapbox/tilelive');
