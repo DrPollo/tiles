@@ -2,7 +2,11 @@
  /	express
  / ---------------------------------------------------------------------- */
 var express = require('express');
+var cors = require('cors')
 var app = express();
+app.use(cors());
+
+
 var fs = require('fs');
 var sh = require('shelljs');
 var tilelive = require('@mapbox/tilelive');
@@ -61,11 +65,7 @@ fs.readFile(filepath, 'utf8', function (err, data) {
     obj = JSON.parse(data);
 });
 
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-});
+
 
 app.get('/tile/:z/:x/:y', function(req, res) {
 
