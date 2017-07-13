@@ -177,7 +177,7 @@ app.get('/area/:z/:lon/:lat', function (req, res) {
 
                 // se non trovo la tile
                 if (err) {
-                    return res.status(200).send(tileId);
+                    return res.status(200).send({id:tileId});
                     // return res.status(404).send({message: 'Missing tile'});
                 }
 
@@ -243,7 +243,7 @@ app.get('/area/:z/:lon/:lat', function (req, res) {
                         }
                     }
 
-                    res.status(200).send(area_id);
+                    res.status(200).send({id:area_id});
                 }
                 else exit;
 
