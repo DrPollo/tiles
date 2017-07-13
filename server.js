@@ -134,25 +134,26 @@ fs.readFile(filepath, 'utf8', function (err, data) {
     obj = JSON.parse(data);
 });
 
-app.get('/area/:z/:x_lon/:y_lat', function (req, res) {
+app.get('/area/:z/:lon/:lat', function (req, res) {
 
     // legge i parametri di z,x,y dalla chiamata GET
     var zoom = req.params.z;
-    var x_lon = req.params.x_lon;
-    var y_lat = req.params.y_lat;
+    var lon = req.params.lon;
+    var lat = req.params.lat;
 
     if (!obj) {
         console.error('cannot load source mapping')
         return res.status(404).send('nothing to load');
     }
 
-    var tile = tilebelt.pointToTile(x_lon, y_lat, zoom);
+    var tile = tilebelt.pointToTile(lon, lat, zoom);
     var file = obj[zoom];
     console.log(tile)
 
-    var x = tile[0]
-    var y = tile[1]
-    var z = tile[2]
+    var x = tile[0];
+    var y = tile[1];
+    var z = tile[2];
+    var tileId = x+':'+y+':'+z;
 
     console.log('getTile', z, x, y);
     // setta il riferimento uri al file mbTile
@@ -171,7 +172,8 @@ app.get('/area/:z/:x_lon/:y_lat', function (req, res) {
 
                 // se non trovo la tile
                 if (err) {
-                    return res.status(404).send({message: 'Missing tile'});
+                    return res.status(200).send(tileId);
+                    // return res.status(404).send({message: 'Missing tile'});
                 }
 
                 var mbtilesfilename = file;
@@ -200,7 +202,7 @@ app.get('/area/:z/:x_lon/:y_lat', function (req, res) {
 
                                 var check = gju.pointInPolygon({
                                     "type": "Point",
-                                    "coordinates": [x_lon, y_lat]
+                                    "coordinates": [lon, lat]
                                 }, polygon)
                                 if (check) {
                                     //console.log(ft,"MULTIPOLYGON",features[ft])
@@ -211,7 +213,7 @@ app.get('/area/:z/:x_lon/:y_lat', function (req, res) {
 
                         if (geoType.toUpperCase() === "POLYGON") {
 
-                            var check = gju.pointInPolygon({"type": "Point", "coordinates": [x_lon, y_lat]}, geom)
+                            var check = gju.pointInPolygon({"type": "Point", "coordinates": [lon, lat]}, geom)
                             if (check) {
                                 //console.log(ft,"POLYGON",features[ft])
                                 checkFt.push(features[ft])
