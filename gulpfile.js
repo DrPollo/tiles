@@ -21,7 +21,7 @@ var mbtilespath = 'mbtiles/';
 var polygonCenter = require('geojson-polygon-center');
 var geojsonArea = require('geojson-area');
 
-gulp.task('build',['load_static_geojson','load_osm_geojson','generatembtile']);
+gulp.task('build',['load_static_geojson','load_osm_geojson','generatembtile','updatedb']);
 
 gulp.task('load_static_geojson',function () {
 
@@ -423,4 +423,21 @@ gulp.task('generatembtile',function() {
         });
     }
 
+});
+
+
+gulp.task('updatedb',function () {
+    console.log('start of updatedb');
+
+    var cmd = 'python ./scriptMongo/import_areas.py';
+
+    var code = sh.exec(cmd).code;
+
+    if(code === 0){
+        console.log('updatedb ok');
+    }else{
+        console.error('error',code);
+    }
+
+    console.log('end of updatedb')
 });
