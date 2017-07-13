@@ -29,6 +29,11 @@ var GeoJSON = require('geojson');
 var gju = require('geojson-utils');
 
 
+// porta
+var defaultPort = 3095;
+
+
+
 //neo4j
 var neo4j = require('neo4j-driver').v1;
 
@@ -352,8 +357,8 @@ app.get('/', function (req, res) {
     res.send('Tile server is running');
 });
 // listner on port
-app.listen(3095, function () {
-    console.log('Tile server is running on port: 3095');
+app.listen(defaultPort, function () {
+    console.log('Tile server is running on port:',defaultPort);
 });
 
 
