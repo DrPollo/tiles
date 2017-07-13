@@ -5,8 +5,8 @@ from bson import ObjectId
 import os
 
 dbName = 'test_tileserver'
-#dbName = 'fl_v4'
-#dbName = 'fl_v4'
+#dbName = 'fl_V4'
+#dbName = 'fl_V4'
 
 client = MongoClient()
 
@@ -45,8 +45,8 @@ def append_new_collection(file_name,collection_name):
         if(len(from_file) > 0):
         	for id_a in from_file:
         	    print(id_a["properties"])
-			    uuid = id_a["properties"]["id"]
-			    id_a["_id"] = uuid
+			    #uuid = id_a["properties"]["id"]
+			    #id_a["_id"] = id_a["properties"]["id"]
 			    #print("append",uuid)
 	    		db[collection_name].insert(id_a)
     else:
@@ -78,7 +78,7 @@ def main():
 		print(area)
 		append_new_collection(area,'allRowAreas')
 		
-	set_ID()
+	#set_ID()
 	
 	#mongoexport --db fl_V4 --collection AllAreas --out AllAreas.json
 	

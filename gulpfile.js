@@ -21,7 +21,10 @@ var mbtilespath = 'mbtiles/';
 var polygonCenter = require('geojson-polygon-center');
 var geojsonArea = require('geojson-area');
 
-gulp.task('build',['load_static_geojson','load_osm_geojson','generatembtile','updatedb']);
+var MongoClient = require('mongodb').MongoClient
+ , assert = require('assert');
+
+gulp.task('build',['load_static_geojson','load_osm_geojson','generatembtile']);
 
 gulp.task('load_static_geojson',function () {
 
@@ -93,6 +96,7 @@ gulp.task('load_static_geojson',function () {
                     console.log(file,zoom_min,zoom_max)
                     var newFeatures = features.map(function(feature){
 
+                        feature._id = UUID.v1();
                         feature.properties.id = UUID.v1();
                         feature.properties.type = sources[file].layer;
                         feature.properties.zoom_min = zoom_min;
@@ -106,7 +110,7 @@ gulp.task('load_static_geojson',function () {
                         };
                         try {
                             delete feature.properties.bbox;
-                            delete feature.properties.geometry;
+                            //delete feature.properties.geometry;
                         }catch (err){
 
                         }
@@ -240,6 +244,7 @@ gulp.task('load_osm_geojson',function () {
                         }
                     }
                     var newFeatures = features.map(function(feature){
+                        feature._id = UUID.v1();
                         feature.properties.id = UUID.v1();
                         feature.properties.type = sources[file].layer;
                         feature.properties.zoom_min = zoom_min;
@@ -253,7 +258,7 @@ gulp.task('load_osm_geojson',function () {
                         };
                         try {
                             delete feature.properties.bbox;
-                            delete feature.properties.geometry;
+                            //delete feature.properties.geometry;
                         }catch (err){
 
                         }
@@ -425,18 +430,38 @@ gulp.task('generatembtile',function() {
 
 });
 
-
 gulp.task('updatedb',function () {
+
+    dbName = 'testTileServer'
+    collectionName = 'AreeTiles'
+
     console.log('start of updatedb');
 
-    var cmd = 'python ./scriptMongo/import_areas.py';
+    // sh.exec(cmd).code;
+    // carico i file geosjon
+    try {
+        var files = fs.readdirSync(geojsonpath + tippecanoepath);
+    } catch (err) {
+        console.error('directory read error ', err);
+        throw new gutil.PluginError({
+            plugin: 'readdireSync',
+            message: geojsonpath + tippecanoepath + " directory read error"
+        });
+    }
 
-    var code = sh.exec(cmd).code;
+    for (var fileName in files) {
+        if(fileName == 0){
+            var cmd = 'mongoimport --db ' +dbName+ ' --collection ' +collectionName+ ' --drop < ' +geojsonpath + tippecanoepath+files[fileName]+ ' --jsonArray';
+            var code = sh.exec(cmd).code;
 
-    if(code === 0){
-        console.log('updatedb ok');
-    }else{
-        console.error('error',code);
+            console.log('Areas from ',fileName,' with result: ', (code ===0) ?'ok': 'error code'+code);
+        }
+        else{
+            var cmd = 'mongoimport --db ' +dbName+ ' --collection ' +collectionName+ ' < ' +geojsonpath + tippecanoepath+files[fileName]+ ' --jsonArray';
+            var code = sh.exec(cmd).code;
+
+            console.log('Areas from ',fileName,' with result: ', (code ===0) ?'ok': 'error code'+code);
+        }
     }
 
     console.log('end of updatedb')
