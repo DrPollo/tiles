@@ -11,6 +11,10 @@ var sequence = require('run-sequence');
 var env = require('gulp-env');
 var jsonMinify = require('gulp-jsonminify');
 
+
+var bbox = require('@turf/bbox');
+
+
 var geojsonpath = './geojson/';
 var tippecanoepath = 'tippecanoe/';
 var tippecanoepathLabels = 'tippecanoepathLabels/'
@@ -23,6 +27,7 @@ var geojsonArea = require('geojson-area');
 
 var mongoDB = 'fl_v2';
 var mongoCollection = 'AreaTiles';
+
 
 
 gulp.task('build',['load_static_geojson','load_osm_geojson','generatembtile','updatedb']);
@@ -103,6 +108,8 @@ gulp.task('load_static_geojson',function () {
                         feature.properties.zoom_min = zoom_min;
                         feature.properties.zoom_max = zoom_max;
                         feature.properties.z_index = sources[file].z_index;
+                        feature.properties.bbox = bbox(feature);
+                        // console.log(feature.properties.bbox);
                         feature['tippecanoe'] = {
                             "maxzoom" : sources[file].maxzoom,
                             "minzoom" : sources[file].minzoom,
@@ -247,6 +254,8 @@ gulp.task('load_osm_geojson',function () {
                         feature.properties.zoom_min = zoom_min;
                         feature.properties.zoom_max = zoom_max;
                         feature.properties.z_index = sources[file].z_index;
+                        feature.properties.bbox = bbox(feature);
+                        // console.log(feature.properties.bbox);
                         feature['tippecanoe'] = {
                             "maxzoom" : sources[file].maxzoom,
                             "minzoom" : sources[file].minzoom,
