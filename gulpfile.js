@@ -115,11 +115,6 @@ gulp.task('load_static_geojson',function () {
                             "minzoom" : sources[file].minzoom,
                             "layer" : sources[file].layer
                         };
-                        try {
-                            delete feature.properties.bbox;
-                        }catch (err){
-
-                        }
                         return feature;
                     });
 
@@ -261,11 +256,6 @@ gulp.task('load_osm_geojson',function () {
                             "minzoom" : sources[file].minzoom,
                             "layer" : sources[file].layer
                         };
-                        try {
-                            delete feature.properties.bbox;
-                        }catch (err){
-
-                        }
                         return feature;
                     });
 
