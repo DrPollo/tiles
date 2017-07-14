@@ -103,7 +103,6 @@ gulp.task('load_static_geojson',function () {
                         feature.properties.zoom_min = zoom_min;
                         feature.properties.zoom_max = zoom_max;
                         feature.properties.z_index = sources[file].z_index;
-                        feature.properties.geometry = feature.geometry;
                         feature['tippecanoe'] = {
                             "maxzoom" : sources[file].maxzoom,
                             "minzoom" : sources[file].minzoom,
@@ -146,8 +145,6 @@ gulp.task('load_static_geojson',function () {
                         };
 
                         try {
-                            delete feature.properties.bbox;
-                            delete feature.properties.geometry;
                             delete feature.properties.zoom_min;
                             delete feature.properties.zoom_max;
                         }catch (err){
@@ -250,7 +247,6 @@ gulp.task('load_osm_geojson',function () {
                         feature.properties.zoom_min = zoom_min;
                         feature.properties.zoom_max = zoom_max;
                         feature.properties.z_index = sources[file].z_index;
-                        feature.properties.geometry = feature.geometry;
                         feature['tippecanoe'] = {
                             "maxzoom" : sources[file].maxzoom,
                             "minzoom" : sources[file].minzoom,
@@ -317,9 +313,6 @@ gulp.task('load_osm_geojson',function () {
                         };
 
                         try {
-                            delete feature.properties.bbox;
-                            delete feature.properties.geometry;
-                            delete feature.properties.geom;
                             delete feature.properties.zoom_min;
                             delete feature.properties.zoom_max;
                         }catch (err){
