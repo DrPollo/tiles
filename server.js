@@ -2,8 +2,9 @@
  /	express
  / ---------------------------------------------------------------------- */
 var express = require('express');
-var cors = require('cors')
+var cors = require('cors');
 var app = express();
+
 app.use(cors({
     "origin": "*",
     "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
@@ -259,27 +260,49 @@ app.get('/area/:z/:lon/:lat', function (req, res) {
 });
 
 
-// gestione aree contenute
+// informazioni sulle aree
+// app.get('/areas/:id', function (req, res) {
+//
+//     // legge il parametro :id
+//     var areaId = req.params.id;
+//
+//     session
+//         .run('MATCH (a:Areas {areaId:$id}) return a.areaId as areaId, a.geojson as geojson', {id:areaId})
+//         .then(function (result) {
+//             var rst={
+//             };
+//             result.records.forEach(function (record) {
+//                 console.log(record.get('areaId'));
+//                 rst=JSON.parse(record.get('geojson'));
+//             });
+//             res.status(200).json(rst)
+//         })
+//         .catch(function (error) {
+//             console.log(error);
+//             res.status(500).json(error);
+//         });
+// });
+
+// informazioni sulle aree
 app.get('/areas/:id', function (req, res) {
 
     // legge il parametro :id
     var areaId = req.params.id;
 
-    session
-        .run('MATCH (a:Areas {areaId:$id}) return a.areaId as areaId, a.geojson as geojson', {id:areaId})
-        .then(function (result) {
-            var rst={
-            };
-            result.records.forEach(function (record) {
-                console.log(record.get('areaId'));
-                rst=JSON.parse(record.get('geojson'));
-            });
-            res.status(200).json(rst)
-        })
-        .catch(function (error) {
-            console.log(error);
-            res.status(500).json(error);
-        });
+    collection.find(
+        {'_id':areaId}
+    ).toArray(function (err, docs) {
+        if (!err) {
+            if (docs.length>0) {
+                res.status(200).json(docs[0]);
+            } else {
+                res.status(404).json({message:"Area "+areaId+" not found"})
+            }
+        } else {
+            res.status(500).json({error: err})
+        }
+
+    });
 });
 
 app.get('/',function (req,res) {
