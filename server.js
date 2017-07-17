@@ -43,7 +43,9 @@ var session = driver.session();
 //fine neo4j
 
 // mongoDB
-var url = 'mongodb://localhost:27017/test';
+var mongoDB = 'fl_v2';
+var mongoCollection = 'area';
+var url = 'mongodb://localhost:27017/'+mongoDB;
 var collection;
 var MongoClient = require('mongodb').MongoClient
     , assert = require('assert');
@@ -56,7 +58,7 @@ MongoClient.connect(url, {
 
     myDb = db;
 
-    collection = myDb.collection("areas");
+    collection = myDb.collection(mongoCollection);
 
     //db.close();
 });// fine mongoDB
@@ -288,9 +290,9 @@ app.get('/areas/:id', function (req, res) {
 
     // legge il parametro :id
     var areaId = req.params.id;
-
+    console.log('searching area with id ',areaId);
     collection.find(
-        {'_id':areaId}
+        {"_id":areaId}
     ).toArray(function (err, docs) {
         if (!err) {
             if (docs.length>0) {

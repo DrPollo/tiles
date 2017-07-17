@@ -26,7 +26,7 @@ var polygonCenter = require('geojson-polygon-center');
 var geojsonArea = require('geojson-area');
 
 var mongoDB = 'fl_v2';
-var mongoCollection = 'AreaTiles';
+var mongoCollection = 'area';
 
 
 
@@ -101,9 +101,9 @@ gulp.task('load_static_geojson',function () {
                     }
                     console.log(file,zoom_min,zoom_max)
                     var newFeatures = features.map(function(feature){
-
-                        feature._id = UUID.v1();
-                        feature.properties.id = UUID.v1();
+                        var id = UUID.v1();
+                        feature._id = id;
+                        feature.properties.id = id;
                         feature.properties.type = sources[file].layer;
                         feature.properties.zoom_min = zoom_min;
                         feature.properties.zoom_max = zoom_max;
@@ -243,8 +243,9 @@ gulp.task('load_osm_geojson',function () {
                         }
                     }
                     var newFeatures = features.map(function(feature){
-                        feature._id = UUID.v1();
-                        feature.properties.id = UUID.v1();
+                        var id = UUID.v1();
+                        feature._id = id;
+                        feature.properties.id = id;
                         feature.properties.type = sources[file].layer;
                         feature.properties.zoom_min = zoom_min;
                         feature.properties.zoom_max = zoom_max;
@@ -444,7 +445,7 @@ gulp.task('updatedb',function () {
         if(fileName == 0){
             var cmd = 'mongoimport --db ' +dbName+ ' --collection ' +collectionName+ ' --drop < ' +geojsonpath + tippecanoepath+files[fileName]+ ' --jsonArray';
             var code = sh.exec(cmd).code;
-
+            console.log(cmd);
             console.log('Areas from ',fileName,' with result: ', (code ===0) ?'ok': 'error code'+code);
         }
         else{
