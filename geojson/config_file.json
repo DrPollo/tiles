@@ -1,7 +1,7 @@
 {
   "Global": {
     "tile_minzoom": 1,
-    "tile_maxzoom": 8,
+    "tile_maxzoom": 14,
     "files": [{
         "name": "world_countries_level_1.geojson",
         "minzoom": 1,
