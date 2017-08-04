@@ -18,7 +18,7 @@ var tilelive = require('@mapbox/tilelive');
 var MBTiles = require('mbtiles');
 var path = require('path');
 var mbtilespath = '/mbtiles/';
-var filepath = __dirname + mbtilespath + 'sourcemap.json';
+var filepath = __dirname + mbtilespath + 'tiles_map.json';
 
 var MBtileUri = 'mbtiles://';
 var zlib = require('zlib');
@@ -28,6 +28,8 @@ tilelive.protocols['mbtiles:'] = require('mbtiles');
 var tilebelt = require('@mapbox/tilebelt');
 var GeoJSON = require('geojson');
 var gju = require('geojson-utils');
+var bboxPolygon = require('@turf/bbox-polygon')
+var turf = require('turf');
 
 
 // porta
@@ -92,8 +94,27 @@ app.get('/tile/:z/:x/:y', function(req, res) {
         return res.status(404).send('nothing to load');
     }
 
+    //Stabilisce quale mbtile richiamare dal file di mapping rispetto al livello di zoom
+    // default : Global (nel caso in cui z > 8 si otterrà comunque "Missing Tile")
+    var file_list = obj[z];
+    console.log(file_list)
+    var file = 'Global.mbtiles'
 
-    var file = obj[z];
+    // controlla se le cordinate x:y rientrano nella bbox del file mbtile
+    for(t in file_list){
+        
+        var poly = bboxPolygon(file_list[t][1]);
+
+        var pt = turf.point([x, y]);
+
+        var check = turf.inside(pt,poly)
+
+        if (check == true) {
+            file = t
+            break;
+        }
+    }
+    console.log(file)
 
 
     // setta il riferimento uri al file mbTile
@@ -149,15 +170,37 @@ app.get('/area/:z/:lon/:lat', function (req, res) {
     var lon = req.params.lon;
     var lat = req.params.lat;
 
+    
+
     if (!obj) {
         console.error('cannot load source mapping')
         return res.status(404).send('nothing to load');
     }
 
-    var tile = tilebelt.pointToTile(lon, lat, zoom);
-    var file = obj[zoom];
-    console.log(tile)
+    //Stabilisce quale mbtile richiamare dal file di mapping rispetto al livello di zoom
+    // default : Global (nel caso in cui z > 8 si otterrà comunque "Missing Tile")
+    var file_list = obj[zoom];
+    console.log(file_list)
+    var file = 'Global.mbtiles'
 
+    // controlla se le cordinate lon:lat rientrano nella bbox del file mbtile
+    for(t in file_list){
+
+        var poly = bboxPolygon(file_list[t][0]);
+  
+        var pt = turf.point([lon, lat]);
+
+        var check = turf.inside(pt,poly)
+
+        if (check) {
+            file = t
+            break;
+        }
+    }
+    console.log(file)
+    
+    // converte le cordinate lon:lat:zoom nella tile x:y:z del file mbtile
+    var tile = tilebelt.pointToTile(lon, lat, zoom);
     var x = tile[0];
     var y = tile[1];
     var z = tile[2];
@@ -176,7 +219,7 @@ app.get('/area/:z/:lon/:lat', function (req, res) {
 
                 res.setHeader('Access-Control-Allow-Origin', '*');
 
-                console.log(err, data)
+                console.log(err, data,tileId)
 
                 // se non trovo la tile
                 if (err) {
@@ -195,7 +238,7 @@ app.get('/area/:z/:lon/:lat', function (req, res) {
 
                     var features = JSON.parse(areasInTile).features;
                     var checkFt = [];
-
+                    // individua l'area che contiene il punto nella tile x:y:z del file mbtile
                     for (var ft in features) {
                         var geoType = features[ft].geometry.type;
                         var geom = features[ft].geometry;
@@ -238,15 +281,15 @@ app.get('/area/:z/:lon/:lat', function (req, res) {
                     for (p_area in checkFt) {
 
                         var z_index = checkFt[p_area].properties.z_index;
-                        //console.log(check_Z,z_index,checkFt[p_area].properties.id)
+                        // in caso di coesistenza di piu layer vince quello con "z_index" maggiore
                         if (z_index > check_Z) {
                             check_Z = z_index;
-                            var area_id = checkFt[p_area].properties.id;
+                            var area_id = checkFt[p_area].properties;
                             //console.log(check_Z,checkFt[p_area].properties.id)
                         }
                     }
 
-                    res.status(200).send({id:area_id});
+                    res.status(200).send({id:area_id.id});
                 }
                 else exit;
 

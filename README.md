@@ -31,6 +31,7 @@ Get Area from point : z/lon/lat
 
 http://localhost:3090/area/12/7.692607641220094/45.08807547183474
 
+ERROR : http://localhost:3090/area/18/7.50409930944/45.0029285906
 
 Get areas
 http://localhost:3090/areas/content/:areaId
