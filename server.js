@@ -3,6 +3,9 @@
  / ---------------------------------------------------------------------- */
 var express = require('express');
 var cors = require('cors');
+const request = require('request');
+var zlib = require('zlib');
+
 var app = express();
 
 app.use(cors({
@@ -21,7 +24,6 @@ var mbtilespath = '/mbtiles/';
 var filepath = __dirname + mbtilespath + 'tiles_map.json';
 
 var MBtileUri = 'mbtiles://';
-var zlib = require('zlib');
 
 tilelive.protocols['mbtiles:'] = require('mbtiles');
 
@@ -30,6 +32,23 @@ var GeoJSON = require('geojson');
 var gju = require('geojson-utils');
 var bboxPolygon = require('@turf/bbox-polygon')
 var turf = require('turf');
+const geojsonvt = require ('geojson-vt');
+const vtpbf = require('vt-pbf');
+var VectorTile = require('@mapbox/vector-tile').VectorTile;
+var Protobuf = require('pbf');
+var merge = require('merge');
+
+// certificates
+
+//const uwum_key = fs.readFileSync('./certificates/uwum_new/sandona.firstlife.org.cert.key.pem');
+//const uwum_cert = fs.readFileSync('./certificates/uwum_new/sandona.firstlife.org.cert.key.pem');
+
+const uwum_key = fs.readFileSync('./certificati/wegovnow.firstlife.org.cert.key.pem');
+const uwum_cert = fs.readFileSync('./certificati/wegovnow.firstlife.org.cert.key.pem');
+
+
+// logger url
+const otmUrl = "https://api.ontomap.eu/api/v1/";
 
 
 // porta
@@ -66,11 +85,65 @@ MongoClient.connect(url, {
 });// fine mongoDB
 
 
-/* ----------------------------------------------------------------------
- /  read and return a tile from mbTiles - STEFANIA 
- /  @params
- /  @output mbTiles tile
- / ---------------------------------------------------------------------- */
+/*
+* @desc Combine two Vector Tile from fl and otm source and return a pbf
+* @param req -> x,y,z {string} tile notation
+* @output pbf
+*/
+
+app.get('/tile/:z/:x/:y', function(req, res) {
+
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    Promise.all([fl_tile(req,res),otm_tile(req,res)]).then(
+        value => { 
+
+            //console.log('value[0] ',value[0]);
+            //console.log('value[1] ',value[1]);
+
+            /* vectorTile
+             * {
+                x, y, z,
+                layers:{
+                    ...layer1. layern...
+                    layerName:[features]
+                }
+                size, 
+             }
+            */
+
+            // combino i layer delle due vector tile
+            var tmp = merge.recursive(value[0],value[1]);
+            //stampa e controlla
+            //console.log('tmp ',tmp);
+
+
+            // encode della nuova vector tile in pbf
+            var newBuf = vtpbf(tmp);
+
+            res.setHeader('Content-Type', 'application/x-protobuf');
+            res.send(200).send(newBuf);
+
+            // comprimo il pbf contenente il vector tile
+            // zlib.gzip(newBuf, function(err, result) {
+
+            //     if(result) {
+            //         res.setHeader('Content-Type', 'application/x-protobuf');
+            //         res.setHeader('Content-Encoding', 'gzip');
+            //         res.send(200).send(result); 
+            //     }
+
+            //     else res.status(404).send({message: 'No zip pbf'});
+            // });
+
+        }).catch(error => { });
+});
+
+/*
+* @desc Read and return a vector tile from mbTiles
+* @param req -> x,y,z {string} tile notation, res object
+* @output Vector Tile
+*/
 
 // Stabilisce quale file mbTile interrogare rispetto al mapping degli zoom sul file mbTilesMap.json
 var obj = null;
@@ -80,22 +153,24 @@ fs.readFile(filepath, 'utf8', function (err, data) {
 });
 
 
-
-app.get('/tile/:z/:x/:y', function(req, res) {
-
+var fl_tile = function(req,res) {
+  return new Promise(function(resolve, reject) {
 
     // legge i parametri di z,x,y dalla chiamata GET
     var z = req.params.z;
     var x = req.params.x;
     var y = req.params.y;
 
+
+    console.log('fl_tile ',x,y,z)
+
     if (!obj) {
         console.error('cannot load source mapping')
-        return res.status(404).send('nothing to load');
+        reject(res.status(404).send('nothing to load'));
     }
 
     //Stabilisce quale mbtile richiamare dal file di mapping rispetto al livello di zoom
-    // default : Global (nel caso in cui z > 8 si otterrà comunque "Missing Tile")
+    // default : Global (nel caso in cui z > tile_maxzoom si otterrà comunque "Missing Tile")
     var file_list = obj[z];
     console.log(file_list)
     var file = 'Global.mbtiles'
@@ -127,41 +202,157 @@ app.get('/tile/:z/:x/:y', function(req, res) {
             // recupera la tile sulle coordinate z, x, y
             src.getTile(z, x, y, function (err, data) {
 
-                res.setHeader('Access-Control-Allow-Origin', '*');
-
-                console.log(err, data)
-                // todo invio tile vuota
                 // se non trovo la tile
                 if (err) {
-                    return res.status(404).send({message: 'Missing tile'});
+                    reject(res.status(404).send({message: 'Missing tile'}));
                 }
 
-                // console.log('getTile',z,x,y,data);
-                res.setHeader('Content-Type', 'application/x-protobuf');
-                res.setHeader('Content-Encoding', 'gzip');
-                res.status(200).send(data);
+                console.log('FL getTile ',z,x,y);
+
+                // decomprimo il pbf contenente la tile
+                zlib.gunzip(data, function(err, buffer) {
+                    if(err) reject(res.status(404).send({message: 'No unzip pbf'}));
+
+                    var obj1 = new VectorTile(new Protobuf(buffer));
+
+                    resolve(obj1);
+                });
+                //console.log('FL getTile ',data)
+                //res.status(200).send(data);
             });
 
         }
         catch (err) {
-            res.status(500).send('db connection error');
+            reject(res.status(500).send({message:'db connection error'}));
         }
     });
+  });
+}
 
-});
+/*
+otm endpoint:
+
+ https://api.ontomap.eu/api/v1/instances/SchemaThing?descriptions=true&geometries=true&subconcepts=true&token=YTIyNDA2YzQtY2EyZi00N2U0LWExNzUtNmNkYjlhMDA0MmEz&applications=ontomap.eu
+ &boundingbox=7.654348611831666,45.0712627079646,7.634103298187256,45.06408684697158
+
+* @desc From tile to bbox query on otm endpoint (geojson > vtpbf > vectorTile). A tile-layer for each "hasType" object.
+* @param req -> x,y,z {string} tile notation, res object
+* @output pbf
+*/
+
+var otm_tile = function(req,res) {
+  return new Promise(function(resolve, reject) {
+
+    // legge i parametri di z,x,y dalla chiamata GET
+    var z = req.params.z;
+    var x = req.params.x;
+    var y = req.params.y;
+
+    console.log('otm_tile ',x,y,z)
+    // converting x,y,z to bbox param
+    // tile = [x,y,z];
+    let tile = [parseInt(req.params.x),parseInt(req.params.y),parseInt(req.params.z)];
+    let bbox = tilebelt.tileToBBOX(tile);
+    console.log(req.params, ">",JSON.stringify(bbox));
+    let query = ("&boundingbox=").concat(bbox.join(","));
+    query = Object.keys(req.query).reduce(
+        (query,key) => {
+            // console.log('reduce',key,req.query[key],query);
+            return query.concat('&',key,'=',req.query[key]);
+        },query);
+
+    console.log('query params for otm logger',query);
+
+    let options = {
+        url: otmUrl+'instances/SchemaThing?descriptions=true&geometries=true&subconcepts=true&applications=ontomap.eu'+query,
+        agentOptions: {
+            cert: uwum_cert,
+            key: uwum_key
+        },
+        headers: {"Content-Type": "application/json"},
+        method: 'GET'
+    };
+
+    console.log('query to OTM logger: ',options.url);
+    request(options, function (error, result, body) {
+        if (error) {
+            console.log("ERRORE: ",error);
+            reject(res.status(404).send({message: 'not found'}));
+        } else {
+            // console.log(ok);
+            
+            var body_json = JSON.parse(body);
+
+            var features = Object.assign(body_json.features);
+            let new_o = {};
+            var new_features = features.reduce(function(res_f,feature){
+                
+                if('hasType' in feature.properties && feature.properties.hasType.length > 0){
+                    let new_f = Object.assign(feature);
+                    let new_l = Object.assign(feature.properties.hasType);
+
+                    if(new_l in new_o) 
+                    {
+                        new_o[new_l].push(new_f)
+                    }
+                    else
+                    {
+                        new_o[new_l] = [];
+                        new_o[new_l].push(new_f)
+                    }
+                    
+                    res_f.push(new_o);
+                }
+
+                return res_f;
+            },[]);
+
+            let buff_layers = {};
+            for (var key_l in new_features[0]) {
+                let new_geo = { "type": "FeatureCollection","features": []};
+                //console.log('check',new_features);
+                new_geo.features = Object.assign(new_features[0][key_l]);
+            
+                // let tileIndex  = geojsonvt(JSON.parse(body));
+
+                let tileIndex = geojsonvt(new_geo, {
+                    maxZoom: z,  // max zoom to preserve detail on
+                    debug: 0    // logging level (0 to disable, 1 or 2)
+                    //indexMaxZoom: z,        // max zoom in the initial tile index
+                });
+                
+                //console.log(tileIndex.tileCoords,key_l) 
+                // [{z: 0, x: 0, y: 0}]
+                let z_t = Object.assign(tileIndex.tileCoords[0].z);
+                let x_t = Object.assign(tileIndex.tileCoords[0].x);
+                let y_t = Object.assign(tileIndex.tileCoords[0].y);
+                let tile_vt = Object.assign(tileIndex.getTile(z_t, x_t, y_t));
+
+                // se non trovo la tile
+                if (!tile_vt) {
+                    reject(res.status(404).send({message: 'Missing tile'}));
+                }
+                else{
+
+                    buff_layers[key_l] = tile_vt;
+                }
+            }
+            var buff = vtpbf.fromGeojsonVt(buff_layers)
+            console.log('OTM getTile ',z,x,y);
+            //console.log('OTM getTile ',buff);
+            //res.status(200).send(buff);
+            var obj2 = new VectorTile(new Protobuf(buff));
+            resolve(obj2);
+        }
+    });
+  });
+}
 
 /* ----------------------------------------------------------------------
  /  read and return an area from mbTiles - STEFANIA 
  /  @params
  /  @output area tile
  / ---------------------------------------------------------------------- */
-
-// Stabilisce quale file mbTile interrogare rispetto al mapping degli zoom sul file mbTilesMap.json
-var obj = null;
-fs.readFile(filepath, 'utf8', function (err, data) {
-    if (err) throw err;
-    obj = JSON.parse(data);
-});
 
 app.get('/area/:z/:lon/:lat', function (req, res) {
 
@@ -178,7 +369,7 @@ app.get('/area/:z/:lon/:lat', function (req, res) {
     }
 
     //Stabilisce quale mbtile richiamare dal file di mapping rispetto al livello di zoom
-    // default : Global (nel caso in cui z > 8 si otterrà comunque "Missing Tile")
+    // default : Global (nel caso in cui z > tile_maxzoom si otterrà comunque "Missing Tile")
     var file_list = obj[zoom];
     console.log(file_list)
     var file = 'Global.mbtiles'
