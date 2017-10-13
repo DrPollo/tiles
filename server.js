@@ -199,7 +199,7 @@ app.get('/tile/:z/:x/:y', function(req, res) {
 
                 // se non trovo la tile
                 if (err) {
-                    return res.status(404).send({message: 'Missing tile FL'});
+                    return res.status(404).send({message: 'Missing tile'});
                 }
 
                 console.log('FL getTile ',z,x,y);
