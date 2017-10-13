@@ -87,7 +87,7 @@ MongoClient.connect(url, {
 * @output pbf
 */
 
-app.get('/tile/:z/:x/:y', function(req, res) {
+app.get('/tileExtended/:z/:x/:y', function(req, res) {
 
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -136,9 +136,9 @@ app.get('/tile/:z/:x/:y', function(req, res) {
 });
 
 /*
-* @desc Read and return a vector tile from mbTiles
-* @param req -> x,y,z {string} tile notation, res object
-* @output Vector Tile
+* @desc Read and return a mbTiles
+* @param req -> x,y,z {string} tile notation
+* @output zipped pbf
 */
 
 // Stabilisce quale file mbTile interrogare rispetto al mapping degli zoom sul file mbTilesMap.json
@@ -148,6 +148,80 @@ fs.readFile(filepath, 'utf8', function (err, data) {
     obj = JSON.parse(data);
 });
 
+app.get('/tile/:z/:x/:y', function(req, res) {
+
+    // legge i parametri di z,x,y dalla chiamata GET
+    var z = req.params.z;
+    var x = req.params.x;
+    var y = req.params.y;
+
+
+    console.log('fl_tile ',x,y,z)
+
+    if (!obj) {
+        console.error('cannot load source mapping')
+        return res.status(404).send('nothing to load');
+    }
+
+    //Stabilisce quale mbtile richiamare dal file di mapping rispetto al livello di zoom
+    // default : Global (nel caso in cui z > tile_maxzoom si otterrà comunque "Missing Tile")
+    var file_list = obj[z];
+    console.log(file_list)
+    var file = 'Global.mbtiles'
+
+    // controlla se le cordinate x:y rientrano nella bbox del file mbtile
+    for(t in file_list){
+        
+        var poly = bboxPolygon(file_list[t][1]);
+
+        var pt = turf.point([x, y]);
+
+        var check = turf.inside(pt,poly)
+
+        if (check == true) {
+            file = t
+            break;
+        }
+    }
+    console.log(file)
+
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    // setta il riferimento uri al file mbTile
+    var uri = MBtileUri.concat(__dirname, mbtilespath, file);
+    console.log(uri);
+
+    // carica l'mbTile dal riferimento uri
+    new MBTiles(uri, function (err, src) {
+        try {
+            // recupera la tile sulle coordinate z, x, y
+            src.getTile(z, x, y, function (err, data) {
+
+                // se non trovo la tile
+                if (err) {
+                    return res.status(404).send({message: 'Missing tile FL'});
+                }
+
+                console.log('FL getTile ',z,x,y);
+
+                //console.log('FL getTile ',data)
+                res.setHeader('Content-Type', 'application/x-protobuf');
+                res.setHeader('Content-Encoding', 'gzip');
+                res.status(200).send(data);
+            });
+
+        }
+        catch (err) {
+            res.status(500).send({message:'db connection error'});
+        }
+    });
+});
+
+/*
+* @desc Read and return a vector tile from mbTiles
+* @param req -> x,y,z {string} tile notation, res object
+* @output Vector Tile
+*/
 
 var fl_tile = function(req,res) {
   return new Promise(function(resolve, reject) {
@@ -162,7 +236,7 @@ var fl_tile = function(req,res) {
 
     if (!obj) {
         console.error('cannot load source mapping')
-        reject(res.status(404).send('nothing to load'));
+        return reject(res.status(404).send('nothing to load'));
     }
 
     //Stabilisce quale mbtile richiamare dal file di mapping rispetto al livello di zoom
@@ -200,25 +274,22 @@ var fl_tile = function(req,res) {
 
                 // se non trovo la tile
                 if (err) {
-                    return reject(res.status(404).send({message: 'Missing tile'}));
+                    return reject(res.status(404).send({message: 'Missing tile FL'}));
                 }
 
                 console.log('FL getTile ',z,x,y);
 
                 // decomprimo il pbf contenente la tile
                 zlib.gunzip(data, function(err, buffer) {
-                    console.log('sono qui');
                     if(err){
                         console.error('zlib.gunzip, error:',err);
                         return reject(res.status(404).send({message: 'No unzip pbf'}));
                     }
-                    console.log('sono qua');
+                    
                     var obj1 = new VectorTile(new Protobuf(buffer));
-                    console.log('sono la');
                     resolve(obj1);
                 });
                 //console.log('FL getTile ',data)
-                //res.status(200).send(data);
             });
 
         }
@@ -330,7 +401,7 @@ var otm_tile = function(req,res) {
 
                 // se non trovo la tile
                 if (!tile_vt) {
-                    reject(res.status(404).send({message: 'Missing tile'}));
+                    return reject(res.status(404).send({message: 'Missing tile OTM'}));
                 }
                 else{
 
