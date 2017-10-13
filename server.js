@@ -1,12 +1,12 @@
 /* ----------------------------------------------------------------------
  /	express
  / ---------------------------------------------------------------------- */
-var express = require('express');
-var cors = require('cors');
+const express = require('express');
+const cors = require('cors');
 const request = require('request');
-var zlib = require('zlib');
+const zlib = require('zlib');
 
-var app = express();
+const app = express();
 
 app.use(cors({
     "origin": "*",
@@ -15,19 +15,19 @@ app.use(cors({
     "optionsSuccessStatus": 204
 }));
 
-var fs = require('fs');
-var sh = require('shelljs');
-var tilelive = require('@mapbox/tilelive');
-var MBTiles = require('mbtiles');
-var path = require('path');
-var mbtilespath = '/mbtiles/';
-var filepath = __dirname + mbtilespath + 'tiles_map.json';
+const fs = require('fs');
+const sh = require('shelljs');
+const tilelive = require('@mapbox/tilelive');
+const MBTiles = require('mbtiles');
+const path = require('path');
+const mbtilespath = '/mbtiles/';
+const filepath = __dirname + mbtilespath + 'tiles_map.json';
 
-var MBtileUri = 'mbtiles://';
+const MBtileUri = 'mbtiles://';
 
 tilelive.protocols['mbtiles:'] = require('mbtiles');
 
-var tilebelt = require('@mapbox/tilebelt');
+const tilebelt = require('@mapbox/tilebelt');
 var GeoJSON = require('geojson');
 var gju = require('geojson-utils');
 var bboxPolygon = require('@turf/bbox-polygon')
@@ -39,12 +39,8 @@ var Protobuf = require('pbf');
 var merge = require('merge');
 
 // certificates
-
-//const uwum_key = fs.readFileSync('./certificates/uwum_new/sandona.firstlife.org.cert.key.pem');
-//const uwum_cert = fs.readFileSync('./certificates/uwum_new/sandona.firstlife.org.cert.key.pem');
-
-const uwum_key = fs.readFileSync('./certificati/wegovnow.firstlife.org.cert.key.pem');
-const uwum_cert = fs.readFileSync('./certificati/wegovnow.firstlife.org.cert.key.pem');
+const uwum_key = fs.readFileSync('./certificates/wegovnow.firstlife.org.cert.key.pem');
+const uwum_cert = fs.readFileSync('./certificates/wegovnow.firstlife.org.cert.key.pem');
 
 
 // logger url
@@ -204,17 +200,21 @@ var fl_tile = function(req,res) {
 
                 // se non trovo la tile
                 if (err) {
-                    reject(res.status(404).send({message: 'Missing tile'}));
+                    return reject(res.status(404).send({message: 'Missing tile'}));
                 }
 
                 console.log('FL getTile ',z,x,y);
 
                 // decomprimo il pbf contenente la tile
                 zlib.gunzip(data, function(err, buffer) {
-                    if(err) reject(res.status(404).send({message: 'No unzip pbf'}));
-
+                    console.log('sono qui');
+                    if(err){
+                        console.error('zlib.gunzip, error:',err);
+                        return reject(res.status(404).send({message: 'No unzip pbf'}));
+                    }
+                    console.log('sono qua');
                     var obj1 = new VectorTile(new Protobuf(buffer));
-
+                    console.log('sono la');
                     resolve(obj1);
                 });
                 //console.log('FL getTile ',data)
@@ -277,7 +277,7 @@ var otm_tile = function(req,res) {
     request(options, function (error, result, body) {
         if (error) {
             console.log("ERRORE: ",error);
-            reject(res.status(404).send({message: 'not found'}));
+            return reject(res.status(404).send({message: 'not found'}));
         } else {
             // console.log(ok);
             
@@ -614,6 +614,12 @@ app.get('/areas/contentmongo/:id', function (req, res) {
 // init tile server
 app.get('/', function (req, res) {
     res.send('Tile server is running');
+});
+
+
+app.use('/libs' ,express.static(__dirname + '/explore/libs'));
+app.get('/explore', function (req, res) {
+    res.sendfile(__dirname + '/explore/index.html');
 });
 // listner on port
 app.listen(defaultPort, function () {
