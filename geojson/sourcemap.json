@@ -54,7 +54,7 @@
     "z_index": 9
   },
   "turin_italy_landusages.geojson": {
-    "minzoom": 15,
+    "minzoom": 10,
     "maxzoom": 20,
     "layer":"landusages",
     "z_index": 10
@@ -66,13 +66,13 @@
     "z_index": 11
   },
     "turin_italy_waterareas.geojson": {
-    "minzoom": 15,
+    "minzoom": 10,
     "maxzoom": 20,
     "layer":"waterareas",
     "z_index": 12
   },
   "turin_italy_waterways.geojson": {
-    "minzoom": 15,
+    "minzoom": 10,
     "maxzoom": 20,
     "layer":"waterways",
     "z_index": 13
