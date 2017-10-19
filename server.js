@@ -156,40 +156,40 @@ app.get('/tile/:z/:x/:y', function(req, res) {
     var y = req.params.y;
 
 
-    console.log('fl_tile ',x,y,z)
+    // console.log('fl_tile ',x,y,z);
 
     if (!obj) {
-        console.error('cannot load source mapping')
+        console.error('cannot load source mapping');
         return res.status(404).send('nothing to load');
     }
 
     //Stabilisce quale mbtile richiamare dal file di mapping rispetto al livello di zoom
     // default : Global (nel caso in cui z > tile_maxzoom si otterrà comunque "Missing Tile")
     var file_list = obj[z];
-    console.log(file_list)
-    var file = 'Global.mbtiles'
+    // console.log(file_list);
+    var file = 'Global.mbtiles';
 
     // controlla se le cordinate x:y rientrano nella bbox del file mbtile
-    for(t in file_list){
+    for(let t in file_list){
         
         var poly = bboxPolygon(file_list[t][1]);
 
         var pt = turf.point([x, y]);
 
-        var check = turf.inside(pt,poly)
+        var check = turf.inside(pt,poly);
 
-        if (check == true) {
-            file = t
+        if (check === true) {
+            file = t;
             break;
         }
     }
-    console.log(file)
+    // console.log(file);
 
     res.setHeader('Access-Control-Allow-Origin', '*');
 
     // setta il riferimento uri al file mbTile
     var uri = MBtileUri.concat(__dirname, mbtilespath, file);
-    console.log(uri);
+    // console.log(uri);
 
     // carica l'mbTile dal riferimento uri
     new MBTiles(uri, function (err, src) {
@@ -202,7 +202,7 @@ app.get('/tile/:z/:x/:y', function(req, res) {
                     return res.status(404).send({message: 'Missing tile FL'});
                 }
 
-                console.log('FL getTile ',z,x,y);
+                // console.log('FL getTile ',z,x,y);
 
                 //console.log('FL getTile ',data)
                 res.setHeader('Content-Type', 'application/x-protobuf');
