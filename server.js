@@ -189,7 +189,7 @@ app.get('/tile/:z/:x/:y', function(req, res) {
 
     // setta il riferimento uri al file mbTile
     var uri = MBtileUri.concat(__dirname, mbtilespath, file);
-    // console.log(uri);
+     console.log(uri,z);
 
     // carica l'mbTile dal riferimento uri
     new MBTiles(uri, function (err, src) {
@@ -277,7 +277,7 @@ var fl_tile = function(req,res) {
                     return reject(res.status(404).send({message: 'Missing tile FL'}));
                 }
 
-                console.log('FL getTile ',z,x,y);
+                //console.log('FL getTile ',z,x,y);
 
                 // decomprimo il pbf contenente la tile
                 zlib.gunzip(data, function(err, buffer) {

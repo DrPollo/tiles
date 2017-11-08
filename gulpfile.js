@@ -77,6 +77,19 @@ gulp.task('load_source_geojson',function () {
     }
     console.log('files to read: ',sanDonaDiPiave_files.length);
 
+    // carico i file osm di Southwark
+    try {
+        var southwark_dir = geojsonpath + "/southwark_osm_geojson/"
+        var southwark_files = fs.readdirSync(southwark_dir);
+    } catch (err) {
+        console.error('directory read error ', err);
+        throw new gutil.PluginError({
+            plugin: 'readdireSync',
+            message: geojsonpath+" directory read error"
+        });
+    }
+    console.log('files to read: ',sanDonaDiPiave_files.length);
+
     // carico il config_file
     console.log('/*********load_config_file********/')
     try {
@@ -151,6 +164,19 @@ gulp.task('load_source_geojson',function () {
                             var ok = true;
                         }catch (err){
                             console.error('error ',err,' loading ',sanDonaDiPiave_dir+file_name);
+                        }
+                    }
+                    break;
+                case "Southwark":
+                    // ciclo i file di SanDonaDiPiave
+                    if(southwark_files.includes(file_name)){
+                        try{
+                            // carico e parsifico il file
+                            var ft_col = fse.readJsonSync(southwark_dir+file_name);
+                            var features = ft_col.features;
+                            var ok = true;
+                        }catch (err){
+                            console.error('error ',err,' loading ',southwark_dir+file_name);
                         }
                     }
                     break;
