@@ -123,4 +123,5 @@ http://localhost:3095/explore
 
 #### Licensing
 Author: Stefania Buccoliero
+
 Author: Alessio Antonini
