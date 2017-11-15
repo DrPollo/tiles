@@ -82,6 +82,7 @@ MongoClient.connect(url, {
 
 
 /*
+* @NOTE : sperimentale NON in uso
 * @desc Combine two Vector Tile from fl and otm source and return a pbf
 * @param req -> x,y,z {string} tile notation
 * @output pbf
@@ -137,7 +138,7 @@ app.get('/tileExtended/:z/:x/:y', function(req, res) {
 
 /*
 * @desc Read and return a mbTiles
-* @param req -> x,y,z {string} tile notation
+* @param req -> z,x,y {string} tile notation
 * @output zipped pbf
 */
 
@@ -218,6 +219,7 @@ app.get('/tile/:z/:x/:y', function(req, res) {
 });
 
 /*
+* @NOTE : sperimentale NON in uso
 * @desc Read and return a vector tile from mbTiles
 * @param req -> x,y,z {string} tile notation, res object
 * @output Vector Tile
@@ -305,7 +307,8 @@ otm endpoint:
 
  https://api.ontomap.eu/api/v1/instances/SchemaThing?descriptions=true&geometries=true&subconcepts=true&token=YTIyNDA2YzQtY2EyZi00N2U0LWExNzUtNmNkYjlhMDA0MmEz&applications=ontomap.eu
  &boundingbox=7.654348611831666,45.0712627079646,7.634103298187256,45.06408684697158
-
+ 
+* @NOTE : sperimentale NON in uso
 * @desc From tile to bbox query on otm endpoint (geojson > vtpbf > vectorTile). A tile-layer for each "hasType" object.
 * @param req -> x,y,z {string} tile notation, res object
 * @output pbf
@@ -419,11 +422,11 @@ var otm_tile = function(req,res) {
   });
 }
 
-/* ----------------------------------------------------------------------
- /  read and return an area from mbTiles - STEFANIA 
- /  @params
- /  @output area tile
- / ---------------------------------------------------------------------- */
+/*
+* @desc Read and return an area from mbTiles
+* @param req -> z,lon,lat {string} cordintes notation
+* @output area tile
+*/
 
 app.get('/area/:z/:lon/:lat', function (req, res) {
 
@@ -590,6 +593,12 @@ app.get('/area/:z/:lon/:lat', function (req, res) {
 //         });
 // });
 
+/*
+* @desc Read and return areas info from its id
+* @param req -> areas id
+* @output areas info
+*/
+
 // informazioni sulle aree
 app.get('/areas/:id', function (req, res) {
 
@@ -616,6 +625,13 @@ app.get('/',function (req,res) {
     return res.status(200).send('ok');
 });
 
+/*
+* @NOTE : sperimentale NON in uso
+* @desc Read and return areas content from its id
+* @param req -> areas id {string}
+* @output areas content
+*/
+
 // gestione aree contenute
 app.get('/areas/content/:id', function (req, res) {
 
@@ -641,6 +657,12 @@ app.get('/areas/content/:id', function (req, res) {
         });
 });
 
+/*
+* @NOTE : sperimentale NON in uso
+* @desc Read and return areas content from its id
+* @param req -> areas id {string}
+* @output areas content
+*/
 
 // gestione aree contenute
 app.get('/areas/contentmongo/:id', function (req, res) {

@@ -88,7 +88,7 @@ gulp.task('load_source_geojson',function () {
             message: geojsonpath+" directory read error"
         });
     }
-    console.log('files to read: ',sanDonaDiPiave_files.length);
+    console.log('files to read: ',southwark_files.length);
 
     // carico il config_file
     console.log('/*********load_config_file********/')
@@ -168,7 +168,7 @@ gulp.task('load_source_geojson',function () {
                     }
                     break;
                 case "Southwark":
-                    // ciclo i file di SanDonaDiPiave
+                    // ciclo i file di Southwark
                     if(southwark_files.includes(file_name)){
                         try{
                             // carico e parsifico il file

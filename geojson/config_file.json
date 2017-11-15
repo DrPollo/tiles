@@ -10,35 +10,7 @@
         "z_index": 1
       },
       {
-        "name": "san_marino_level_2.geojson",
-        "minzoom": 1,
-        "maxzoom": 7,
-        "layer": "nazioni_mondo",
-        "z_index": 1
-      },
-      {
-        "name": "vaticano_level_2.geojson",
-        "minzoom": 1,
-        "maxzoom": 7,
-        "layer": "nazioni_mondo",
-        "z_index": 1
-      },
-      {
         "name": "regioni_europa_level_4.geojson",
-        "minzoom": 5,
-        "maxzoom": 13,
-        "layer": "regioni_europa",
-        "z_index": 2
-      },
-      {
-        "name": "san_marino_level_2.geojson",
-        "minzoom": 5,
-        "maxzoom": 13,
-        "layer": "regioni_europa",
-        "z_index": 2
-      },
-      {
-        "name": "vaticano_level_2.geojson",
         "minzoom": 5,
         "maxzoom": 13,
         "layer": "regioni_europa",
@@ -52,36 +24,8 @@
         "z_index": 3
       },
       {
-        "name": "san_marino_level_2.geojson",
-        "minzoom": 8,
-        "maxzoom": 13,
-        "layer": "province_europa",
-        "z_index": 3
-      },
-      {
-        "name": "vaticano_level_2.geojson",
-        "minzoom": 8,
-        "maxzoom": 13,
-        "layer": "province_europa",
-        "z_index": 3
-      },
-      {
         "name": "comuni_italia_level_8.geojson",
-        "minzoom": 10,
-        "maxzoom": 16,
-        "layer": "comuni_italia",
-        "z_index": 4
-      },
-           {
-        "name": "san_marino_level_2.geojson",
-        "minzoom": 10,
-        "maxzoom": 16,
-        "layer": "comuni_italia",
-        "z_index": 4
-      },
-      {
-        "name": "vaticano_level_2.geojson",
-        "minzoom": 10,
+        "minzoom": 13,
         "maxzoom": 16,
         "layer": "comuni_italia",
         "z_index": 4
@@ -175,7 +119,7 @@
     "tile_minzoom": 13,
     "tile_maxzoom": 20,
     "files": [{
-        "name": "comuni_italia_level_8.geojson",
+        "name": "comuni_italia_level_8_MINI.geojson",
         "minzoom": 13,
         "maxzoom": 16,
         "layer": "comuni_italia",
